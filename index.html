@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#153333">
+<title>THE SEAM | Student Survey &amp; 3D Research Diagram</title>
+<style>
+:root{--ivory:#f8f5ef;--white:#fffcf7;--ink:#222b29;--muted:#6d7572;--line:#ddd8cb;--gold:#ac864c;--gold2:#d9bb7c;--dark:#143432;--teal:#219b8c;--blue:#3777ac;--copper:#c68a53;--red:#ca5546;--radius:18px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);background:var(--ivory);font:15px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+button:focus-visible,input:focus-visible{outline:3px solid #559d91;outline-offset:3px}
+.serif{font-family:Georgia,'Times New Roman',serif}
+.upper{text-transform:uppercase;letter-spacing:.22em;font-weight:700;font-size:10px}
+.muted{color:var(--muted)}
+.shell{max-width:1440px;margin:auto;padding:0 34px}
+.top-rule{border-bottom:1px solid rgba(226,215,194,.18);background:#123230;color:#fff}
+.top-rule .shell{display:flex;justify-content:space-between;align-items:center;min-height:38px;gap:20px;font-size:10px;letter-spacing:.20em;text-transform:uppercase}
+.hero{background:linear-gradient(125deg,#faf6ed 0%,#f3eee5 100%);border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.hero .shell{display:flex;justify-content:space-between;gap:30px;align-items:center;min-height:158px;padding-top:22px;padding-bottom:23px}
+.hero:after{content:'';position:absolute;right:-35px;bottom:-50px;width:600px;height:180px;opacity:.27;background:repeating-radial-gradient(ellipse at 30% 120%,transparent 0,transparent 20px,#bdb5a3 21px,transparent 22px);pointer-events:none}
+.brandline{display:flex;gap:19px;align-items:center;flex-wrap:wrap}
+.brandline h1{font:normal clamp(41px,5.8vw,77px)/1.05 Georgia,serif;letter-spacing:.045em;margin:0}
+.gold-rule{height:2px;background:var(--gold);width:54px;display:inline-block}
+.hero-kicker{font:italic clamp(15px,2vw,20px)/1.25 Georgia,serif;max-width:250px}
+.hero-description{max-width:600px;font:15px/1.55 Georgia,serif;color:#565d59;margin:15px 0 0}
+.hero-art{flex:0 0 250px;max-width:27%;position:relative;z-index:1}
+.hero-art svg{width:100%;height:auto}
+.workspace{max-width:1440px;margin:auto;padding:28px 34px 65px}
+.navrow{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.navtabs{display:flex;gap:7px;flex-wrap:wrap}
+.navtabs button{border:1px solid #cfc8bb;border-radius:999px;background:#fffaf3;color:#4d5854;padding:10px 17px;font-size:12px;font-weight:750}
+.navtabs button.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.status{font-size:12px;display:flex;align-items:center;gap:7px;color:#53635c}
+.status .light{width:9px;height:9px;background:#328b78;display:inline-block;border-radius:50%;box-shadow:0 0 0 3px #328b781e}
+.status.error{color:#a14c36}
+.status.error .light{background:#aa563b}
+.card{background:var(--white);border:1px solid #ded8ca;border-radius:var(--radius);box-shadow:0 10px 35px rgba(38,45,39,.045)}
+.survey-layout{display:grid;grid-template-columns:minmax(210px,.72fr) minmax(360px,1.25fr);gap:23px;align-items:start}
+.intro-panel{padding:30px 28px 22px;position:relative;overflow:hidden;min-height:470px;background:linear-gradient(152deg,#17403f 0%,#17312f 70%,#193d39 100%);color:#fff;border-radius:var(--radius);box-shadow:0 12px 28px #233f3520}
+.intro-panel .upper{color:#d4c28e}
+.intro-panel h2{font:normal clamp(32px,3vw,44px)/1.12 Georgia,serif;margin:20px 0}
+.intro-panel p{color:#dfebdf;max-width:360px}
+.steps{display:flex;flex-direction:column;gap:21px;margin-top:29px;position:relative;z-index:1}
+.step{display:flex;align-items:center;gap:12px;color:#b8cdcb;font-size:12px}
+.step .bubble{width:27px;height:27px;display:grid;place-items:center;border:1px solid #6b8b83;border-radius:50%;font-weight:800;flex:0 0 auto}
+.step.active{color:#fff;font-weight:700}.step.active .bubble{background:var(--gold);border-color:var(--gold);color:white}
+.step.done .bubble{background:#d9cba4;color:var(--dark);border-color:#d9cba4}
+.intro-decoration{position:absolute;bottom:-60px;right:-40px;width:310px;height:310px;border:1px solid #8dbeb336;border-radius:50%;pointer-events:none}
+.intro-decoration:before,.intro-decoration:after{content:'';position:absolute;border:1px solid #a5cfc238;border-radius:50%}.intro-decoration:before{inset:33px}.intro-decoration:after{inset:78px}
+.form-shell{padding:28px 31px 30px;min-height:470px}
+.form-tag{color:#927341;margin-bottom:13px}
+.form-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.form-shell h2{font:normal clamp(25px,3vw,33px)/1.15 Georgia,serif;margin:0 0 10px}
+.form-shell p{margin:7px 0 12px}
+.progress-top{display:flex;justify-content:space-between;gap:12px;color:#66756d;font-size:11px;margin-top:25px}
+.progress{height:5px;background:#e9e2d5;border-radius:9px;overflow:hidden;margin:7px 0 26px}
+.progress > div{height:100%;width:0;background:linear-gradient(90deg,#b58e54,#d6b779);transition:width .18s}
+.q-index{color:#998055;letter-spacing:.15em;font-weight:800;font-size:10px;margin-bottom:16px}
+.question-text{font:normal clamp(23px,2.9vw,32px)/1.26 Georgia,serif;max-width:660px;margin:0 0 10px}
+.period{font-size:12px;color:#79847e;margin-bottom:25px}
+.answers{display:grid;gap:10px;margin:17px 0 28px}
+.answer{display:flex;align-items:center;min-height:58px;gap:16px;border:1px solid #ddd7cd;background:#fffdfa;border-radius:10px;padding:11px 15px;cursor:pointer;transition:background .18s,border-color .18s,box-shadow .18s}
+.answer:hover{border-color:#beaa81;background:#fdf9f1}.answer:has(input:checked){border-color:var(--gold);background:#f7ecd8;box-shadow:inset 3px 0 var(--gold)}
+.answer input{width:19px;height:19px;margin:0;accent-color:#9d7942;flex:0 0 auto}
+.answer .num{font:normal 19px Georgia,serif;width:17px;flex:0 0 auto}
+.answer span:last-child{font-size:14px}
+.actions{display:flex;justify-content:space-between;gap:14px;margin-top:22px;align-items:center}
+.btn{border:1px solid #d9d0c1;border-radius:9px;padding:12px 19px;background:#f9f5ed;color:#34423d;font-weight:750;font-size:13px;min-height:46px}
+.btn.primary{border-color:var(--gold);background:linear-gradient(130deg,#a88246,#b59560);color:white;box-shadow:0 4px 10px #7b5a3420}
+.btn.teal{border-color:var(--dark);background:var(--dark);color:white}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.notice{background:#f4efe5;border:1px solid #e6dccb;border-radius:11px;padding:14px 15px;color:#675e50;font-size:12px}
+.consent{display:flex;gap:12px;align-items:flex-start;font-size:13px;border:1px solid #e2d8c9;padding:14px;border-radius:10px;background:#fffefa;margin:22px 0}
+.consent input{width:20px;height:20px;accent-color:var(--gold);margin:0;flex:0 0 auto}
+.error-msg{border:1px solid #c46d51;color:#963f2c;background:#fff1e9;border-radius:9px;padding:11px 15px;margin:12px 0;font-weight:650;font-size:13px}
+.dashboard{display:grid;grid-template-columns:190px minmax(0,1fr);gap:0;min-height:660px;overflow:hidden}
+.sidebar{background:linear-gradient(180deg,#183c3a,#142e2e);color:white;padding:25px 14px}
+.sidebar h2{font:normal 27px Georgia,serif;margin:0 8px 25px}
+.sidenav{display:flex;flex-direction:column;gap:6px}
+.sidenav span{padding:12px;border-radius:9px;color:#d3e2df;font-size:12px}
+.sidenav .active{background:#b38f58;color:white;font-weight:800}
+.side-caption{border-top:1px solid #5d7a72;margin:46px 7px 0;padding-top:17px;color:#bdbb99}
+.dash-content{padding:24px 25px 29px;min-width:0}
+.dash-title-row{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:20px}
+.dash-title-row h2{margin:0;font:normal 30px Georgia,serif}
+.pill{border:1px solid #ded5c6;border-radius:999px;background:#fbf7ed;color:#806842;padding:6px 12px;white-space:nowrap;font-size:11px}
+.stat-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.stat{background:#fffdf9;border:1px solid #e2dbd1;border-radius:11px;padding:15px 12px;min-width:0}
+.stat:last-child{background:#f7eee0;border-color:#e1caab}
+.stat .small{color:#67726b;font-size:10px;min-height:28px}
+.stat b{font:normal 27px Georgia,serif;display:block;white-space:nowrap}
+.chart-card{border:1px solid #e1dacd;background:#fffefa;border-radius:13px;overflow:hidden}
+.chart-bar{padding:15px 18px 12px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid #f0e9de}
+.chart-bar h3{font:normal 22px Georgia,serif;margin:0}
+.tools{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.tool{border:1px solid #ded9cf;background:#fbfaf6;border-radius:7px;padding:7px 11px;min-height:35px;font-size:11px;font-weight:800;color:#61716b}
+.tool.active{background:#ad8950;color:#fff;border-color:#ad8950}
+.chart-region{display:grid;grid-template-columns:minmax(0,1fr) 270px;min-width:0}
+.graph-wrap{position:relative;min-width:0;background:radial-gradient(circle at 40% 60%,#fffdfa,#f9f5ed);overflow:hidden}
+.chartcanvas{display:block;width:100%;height:460px;touch-action:none;cursor:grab}
+.chartcanvas:active{cursor:grabbing}
+.graph-note{padding:8px 18px 15px;color:#778078;font-size:11px;display:flex;align-items:center;gap:7px}
+.graph-note .color{height:10px;width:10px;border-radius:50%;display:inline-block}
+.inspector{padding:21px 17px;background:#fcfaf5;border-left:1px solid #e8e0d4;min-width:0}
+.inspector h4{font:normal 22px Georgia,serif;margin:0 0 15px}
+.inspector .meta{font-size:10px;letter-spacing:.15em;color:#957f56;margin-bottom:10px}
+.inspect-line{padding:11px 0;border-bottom:1px solid #e8e0d5}
+.inspect-line small{display:block;color:#89908b;font-size:10px;margin-bottom:3px}
+.inspect-line strong{font-size:13px;font-weight:750;overflow-wrap:anywhere}
+.inspect-line .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:7px}
+.empty-tip{color:#7c827c;font-size:13px;line-height:1.6}
+.foot-panel{display:flex;gap:13px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:15px 20px;background:#faf7f0;border-top:1px solid #e9e0d5}
+.foot-panel p{font-size:11px;color:#777e78;max-width:600px;margin:0}
+.foot-actions{display:flex;gap:7px;flex-wrap:wrap}
+.foot-actions button{border:1px solid #d8d0c2;padding:8px 12px;border-radius:7px;background:white;font-size:11px;color:#4b5851;font-weight:800}
+.modal-backdrop{position:fixed;inset:0;z-index:999;background:rgba(13,29,28,.72);display:grid;place-items:center;padding:12px}
+.modal{background:var(--white);width:min(920px,100%);max-height:min(900px,calc(100dvh - 24px));overflow:auto;border-radius:18px;box-shadow:0 24px 85px #0005}
+.modal-top{text-align:center;padding:23px 24px 10px}
+.modal-icon{margin:0 auto 10px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:2px solid #b89458;color:#b89458;font-size:22px}
+.modal-top h2{font:normal 35px Georgia,serif;margin:8px 0 4px}.modal-top p{margin:4px auto;max-width:620px;font-size:13px;color:#717a72}
+.modal-chart{padding:8px 16px 5px}
+.modal-chart .chartcanvas{height:360px}
+.modal-tip{background:#f7efdf;margin:4px 20px;padding:10px 14px;border-radius:7px;font-size:11px;color:#765e39}
+.modal-bottom{padding:14px 22px 25px;text-align:center}
+.modal-bottom .btn{min-width:215px}
+.debrief{margin:12px auto;max-width:800px;background:#f3f6f0;border-left:3px solid #4a948b;text-align:left;padding:12px 15px;color:#52655e;font-size:12px;line-height:1.5}
+.debrief b{color:#27413b}
+.locked-top{padding:17px 19px;border:1px solid #bbd8c6;background:#edf5ed;color:#285d4d;border-radius:10px;margin-bottom:18px;font-weight:700;font-size:13px}
+.student-result{padding:24px}
+.student-result h2{font:normal 31px Georgia,serif;margin:0 0 10px}
+.student-result .chartcanvas{height:450px}
+.student-result .chart-region{grid-template-columns:1fr}
+.no-records{font:italic 16px Georgia,serif;color:#73817a;text-align:center;margin:0 auto;max-width:270px}
+.readme-line{color:#7c817b;font-size:11px;margin-top:16px}
+@media(max-width:1050px){.stat-grid{grid-template-columns:repeat(3,1fr)}.chart-region{grid-template-columns:1fr}.inspector{border-left:0;border-top:1px solid #e8e0d4}.survey-layout{grid-template-columns:.7fr 1.3fr}.sidebar{display:none}.dashboard{display:block}}
+@media(max-width:700px){.shell{padding-left:18px;padding-right:18px}.hero .shell{min-height:140px;padding-top:21px;padding-bottom:24px}.hero-art{display:none}.hero-description{font-size:13px}.workspace{padding:18px 13px 50px}.survey-layout{grid-template-columns:1fr;gap:13px}.intro-panel{min-height:auto;padding:23px}.intro-panel h2{font-size:31px;margin:10px 0}.intro-panel p{font-size:12px;margin:5px 0}.steps{flex-direction:row;justify-content:space-between;margin-top:15px;gap:5px}.step{gap:5px;font-size:10px}.step .bubble{width:24px;height:24px}.form-shell{padding:22px 18px;min-height:0}.question-text{font-size:25px}.dash-content{padding:15px 12px}.stat-grid{grid-template-columns:repeat(2,1fr)}.stat .small{min-height:auto}.stat b{font-size:24px}.chartcanvas{height:355px}.modal-chart .chartcanvas{height:300px}.modal-top h2{font-size:30px}.modal-top{padding:18px 12px 8px}.modal-tip{margin:4px 9px}.navtabs button{padding:8px 12px}.navrow .status{font-size:11px}.intro-decoration{display:none}.chart-bar{padding:12px}.student-result{padding:15px}.student-result .chartcanvas{height:360px}}
+@media(max-width:390px){.hero .brandline h1{font-size:44px}.hero-kicker{font-size:13px}.step{font-size:9px}.form-shell{padding:18px 14px}.answer{min-height:60px}.actions .btn{padding:12px 14px}.dash-title-row h2{font-size:24px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto};.progress>div{transition:none}}
+</style>
+</head>
+<body>
+<div class="top-rule"><div class="shell"><span>Research survey system</span><span>Graduate thesis · Spatial research</span></div></div>
+<header class="hero"><div class="shell"><div><div class="brandline"><h1>THE SEAM</h1><span class="gold-rule"></span><span class="hero-kicker">Students, decisions,<br>and uncertainty</span></div><p class="hero-description">A student experience survey and spatial representation of everyday academic decisions.</p></div><div class="hero-art" aria-hidden="true"><svg viewBox="0 0 270 140"><defs><linearGradient id="architect" x1="0" x2="1"><stop stop-color="#c7ba9d" stop-opacity=".18"/><stop offset="1" stop-color="#bb8e5a" stop-opacity=".42"/></linearGradient></defs><path d="M0 125 Q65 23 137 100 T270 40 L270 139 L0 139Z" fill="url(#architect)"/><path d="M0 125 Q65 23 137 100 T270 40" stroke="#ab9369" stroke-width="1.6" fill="none"/><path d="M0 139 Q70 52 137 112 T270 66" stroke="#d2b47f" stroke-width="1" fill="none"/></svg></div></div></header>
+<div class="workspace">
+<div class="navrow"><div class="navtabs" role="navigation" aria-label="Test interface views"><button id="tabStudent" class="active" type="button">01 · Participant survey</button><button id="tabResearch" type="button">02 · Researcher dashboard</button><button id="btnOpenWindow" type="button" title="Open the researcher view in a separate browser window">↗ Open researcher window</button></div><div id="appStatus" class="status" role="status"><span class="light"></span><span id="statusText">Starting interactive survey…</span></div></div>
+<div id="studentScreen">
+ <div class="survey-layout" id="surveyArea">
+  <aside class="intro-panel"><div class="upper">Participant experience</div><h2>Academic choices<br>and experiences.</h2><p>A short, anonymous questionnaire about decisions made during the last four weeks of classes.</p><div class="steps" aria-label="Survey progress"><div id="stepConsent" class="step active"><span class="bubble">1</span>Consent</div><div id="stepQuestions" class="step"><span class="bubble">2</span>Survey</div><div id="stepComplete" class="step"><span class="bubble">3</span>Complete</div></div><span class="intro-decoration"></span></aside>
+  <section class="card form-shell"><div class="form-tag upper" id="formKicker">Study participation</div><div id="consentPane"><div class="form-head"><div><h2>Before you begin</h2><p class="muted">Please review the information below.</p></div><span class="pill">About 3 minutes</span></div><div class="notice"><b>Purpose:</b> This research explores academic experiences, decision-making, feedback, and uncertainty among higher-education students. Participation is voluntary and intended for adults 18 and older. You may stop before submitting without having your answers recorded.<br><br><b>Data:</b> Nine ratings are recorded anonymously, with a submission timestamp. The researcher can inspect individual ratings and submission times. No names, emails, student IDs, or IP addresses are requested by this offline prototype. Once submitted, answers cannot be changed or withdrawn individually because no identity is linked to them.<br><br><b>Testing:</b> This is an offline demonstration, not a university-approved live study. Responses remain on this browser only unless exported.</div><label class="consent"><input id="consentCheck" type="checkbox"><span>I am at least 18 years old, have read the information above, and voluntarily agree to take part in this test survey.</span></label><div id="consentError" class="error-msg" hidden>Please check the participation box to continue.</div><div class="actions"><span class="muted" style="font-size:12px">No identifying information requested.</span><button id="btnStart" class="btn primary" type="button">Begin survey →</button></div></div>
+  <div id="questionPane" hidden><div class="form-head"><div><h2>Student experiences</h2><p class="muted">Select the option closest to what occurred.</p></div><span class="pill">Anonymous</span></div><div class="progress-top"><span id="qProgressText">Question 1 of 9</span><span id="qPercent">11%</span></div><div class="progress"><div id="qBar"></div></div><div id="qNumber" class="q-index">QUESTION 01</div><h3 id="qText" class="question-text"></h3><div class="period">During the past four weeks of classes</div><div id="options" class="answers" role="radiogroup" aria-label="Frequency of experience"></div><div id="qError" class="error-msg" hidden>Choose one response to continue.</div><div class="actions"><button id="btnBack" class="btn" type="button">← Back</button><button id="btnNext" class="btn primary" type="button">Next question →</button></div><p class="readme-line">Your answers are not plotted or shown on the graph until you submit.</p></div></section>
+ </div>
+ <div id="studentResult" class="card student-result" hidden><div class="locked-top">✓ Survey completed. Your answers have been recorded and locked.</div><div class="upper form-tag">Your spatial position</div><h2>You are now part of the diagram.</h2><p class="muted">Your response appears as the red marker. Other completed submissions are shown in gray. Rotate, pan, or zoom to explore the graph; plotted positions cannot be edited.</p><div class="chart-card"><div class="chart-bar"><h3>Three pressures · One position</h3><div class="tools" id="resultTools"></div></div><div class="chart-region"><div class="graph-wrap"><canvas id="resultCanvas" class="chartcanvas" aria-label="Three dimensional triangular pressure diagram"></canvas><div class="graph-note"><span class="color" style="background:var(--red)"></span> Your position <span class="color" style="background:#8b9793;margin-left:13px"></span> Other anonymous submissions</div></div></div></div><p class="readme-line">You can revisit this result from the same browser. Individual answers cannot be revised.</p></div>
+</div>
+<div id="researchScreen" hidden>
+ <div class="dashboard card"><aside class="sidebar"><h2>THE SEAM</h2><div class="sidenav"><span class="active">◇ &nbsp; Overview</span><span>⬡ &nbsp; 3D Diagram</span><span>▦ &nbsp; Responses</span><span>▥ &nbsp; Analysis</span><span>⇩ &nbsp; Export</span></div><div class="side-caption upper">Research analysis<br>environment</div></aside>
+ <div class="dash-content"><div class="dash-title-row"><div><div class="upper" style="color:#997b4d">Research survey system</div><h2>Researcher dashboard</h2></div><span class="pill" id="researchUpdated">No submissions yet</span></div><div class="stat-grid"><div class="stat"><div class="small">Submitted participants</div><b id="statCount">0</b></div><div class="stat"><div class="small">Family · Average</div><b id="statFamily">—</b></div><div class="stat"><div class="small">Financial · Average</div><b id="statFinancial">—</b></div><div class="stat"><div class="small">Evaluation · Average</div><b id="statAcademic">—</b></div><div class="stat"><div class="small">Total pressure · Mean</div><b id="statTotal">—</b></div></div><div class="chart-card"><div class="chart-bar"><h3>3D triangular pressure diagram</h3><div id="researchTools" class="tools"></div></div><div class="chart-region"><div class="graph-wrap"><canvas id="researchCanvas" class="chartcanvas" aria-label="Interactive triangular 3D plot of submitted students"></canvas><div class="graph-note"><span class="color" style="background:var(--blue)"></span> Family <span class="color" style="background:var(--teal);margin-left:10px"></span> Financial <span class="color" style="background:var(--copper);margin-left:10px"></span> Academic evaluation</div></div><aside class="inspector"><div class="meta">POINT INSPECTOR</div><h4 id="inspectHead">Select a point</h4><div id="inspectEmpty" class="empty-tip">Hover over a plotted marker or tap it on a touchscreen to reveal the exact submission date and time in Eastern Time.<br><br>No sample data is preloaded.</div><div id="inspectDetails" hidden><div class="inspect-line"><small>Submitted · Eastern Time</small><strong id="inspectTime"></strong></div><div class="inspect-line"><small><span class="dot" style="background:var(--blue)"></span>Family expectations</small><strong id="inspectFamily"></strong></div><div class="inspect-line"><small><span class="dot" style="background:var(--teal)"></span>Financial obligations</small><strong id="inspectFinancial"></strong></div><div class="inspect-line"><small><span class="dot" style="background:var(--copper)"></span>Academic evaluation</small><strong id="inspectAcademic"></strong></div><div class="inspect-line"><small>Total reported pressure</small><strong id="inspectTotal"></strong></div><div class="inspect-line" id="inspectOverlapsWrap" hidden><small>Students at this same location</small><strong id="inspectOverlaps"></strong></div></div></aside></div><div class="foot-panel"><p>Only completed entries are shown. Timestamps in this local test come from the browser clock and are formatted for America/New_York (EST/EDT). A deployed study should record authoritative submission times on the server.</p><div class="foot-actions"><button type="button" id="btnExport">Export CSV</button><button type="button" id="btnReset">Clear test responses</button></div></div></div></div>
+ </div>
+</div>
+</div>
+<div id="successBackdrop" class="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="successHeading"><div class="modal-top"><div class="modal-icon">✓</div><div class="upper" style="color:#9c8153">Survey complete</div><h2 id="successHeading">Your response has been recorded.</h2><p>Thank you for participating. Your answers are now locked. The red point shows where your responses place you within the three academic influences.</p></div><div class="modal-chart"><canvas id="successCanvas" class="chartcanvas" aria-label="Your point among the other completed anonymous responses"></canvas></div><div class="modal-tip">● &nbsp; Your red point is shown alongside other completed anonymous responses. The colors blend between <b>family (blue)</b>, <b>financial (teal)</b>, and <b>academic evaluation (copper)</b>.</div><div class="modal-bottom"><div class="debrief"><b>About this research:</b> The study examines how family expectations, financial circumstances, and evaluation may influence whether students share uncertainty. The diagram shows the balance among the three responses in plan and their overall reported intensity in height. It is an exploratory visualization, not a psychological diagnosis.</div><button type="button" id="btnExplore" class="btn primary">Explore the 3D diagram →</button></div></section></div>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const STORAGE='theseam_final_test_run_v1',CHANNEL='theseam_final_test_run_updates_v1';
+const QUESTIONS=[
+'How often did expectations from family or people who support you affect an academic decision?',
+'How often did expenses, paid work, or financial obligations affect an academic decision?',
+'How often did a grade, critique, or evaluation affect what you chose to share about your work?',
+'How often did you decide not to ask a question in class or during a critique?',
+'How often did you describe an academic decision as settled while still considering alternatives?',
+'How often did you postpone requesting feedback on your work?',
+'How often did keeping a concern private make a classroom interaction easier?',
+'How often did keeping a concern private make an academic task harder later?',
+'How often did you discuss an unfinished idea with an instructor or classmate?'];
+const LABELS=['Never','Rarely','Sometimes','Often'];
+const COLORS=[[55,119,172],[33,155,140],[198,138,83]];
+const VERTS=[{x:0,y:150,z:0},{x:-132,y:-75,z:0},{x:132,y:-75,z:0}];
+let state={records:[],submitted:null}, answers=Array(9).fill(null),consented=false,questionIndex=0,modalOpen=false,activeView='student';
+let storageAvailable=true, studentChart,researchChart,successChart, lastInspected=null;
+let syncChannel=null;
+function getStored(){try{const v=localStorage.getItem(STORAGE);if(v){const obj=JSON.parse(v);if(obj&&Array.isArray(obj.records))return{records:obj.records.filter(validRecord),submitted:typeof obj.submitted==='string'?obj.submitted:null}}}catch(e){storageAvailable=false}return{records:[],submitted:null}}
+function validRecord(r){return r && r.type==='participant' && typeof r.id==='string' && Array.isArray(r.answers) && r.answers.length===9 && r.answers.every(v=>Number.isInteger(v)&&v>=1&&v<=4)&&!isNaN(new Date(r.created_at).getTime())}
+function commit(){try{localStorage.setItem(STORAGE,JSON.stringify(state))}catch(e){storageAvailable=false;status('Offline storage unavailable; submissions will not survive reload.',true)}try{syncChannel?.postMessage({type:'updated'})}catch(e){} updateAll()}
+function status(t,error=false){$('statusText').textContent=t;$('appStatus').classList.toggle('error',error)}
+function average(index){return state.records.length?(state.records.reduce((s,r)=>s+r.answers[index],0)/state.records.length).toFixed(2):'—'}
+function timestamp(iso){const d=new Date(iso);const fmt=(opts)=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',...opts}).format(d);return `${fmt({month:'short',day:'numeric',year:'numeric'})} · ${fmt({hour:'numeric',minute:'2-digit',second:'2-digit',timeZoneName:'short'})}`}
+function normalize(v){return (v-1)/3}
+function metrics(r){const pts=[0,1,2].map(i=>({x:VERTS[i].x*normalize(r.answers[i]),y:VERTS[i].y*normalize(r.answers[i]),z:0}));const bx=pts.reduce((s,p)=>s+p.x,0)/3,by=pts.reduce((s,p)=>s+p.y,0)/3;const total=r.answers[0]+r.answers[1]+r.answers[2];return{base:{x:bx,y:by,z:0},top:{x:bx,y:by,z:(total-3)/9*205},total,pts}}
+function brighten(rgb,a){return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`}
+function mix(cs,weights,alpha=1){const c=[0,1,2].map(k=>Math.round(weights.reduce((s,w,i)=>s+w*cs[i][k],0)));return brighten(c,alpha)}
+function pointBlend(a,b,c,u,v,w){return{x:a.x*u+b.x*v+c.x*w,y:a.y*u+b.y*v+c.y*w,z:a.z*u+b.z*v+c.z*w}}
+class Triangle{
+ constructor(canvas,opts={}){this.el=canvas;this.ctx=canvas.getContext('2d');this.researcher=!!opts.researcher;this.selection=opts.selection||null;this.mode='3d';this.yaw=-.12;this.tilt=.59;this.zoom=1;this.pan={x:0,y:0};this.tool='orbit';this.hotspots=[];this.drag=null;this.bound();this.size();}
+ size(){const rect=this.el.getBoundingClientRect();const width=Math.max(320,rect.width||650),height=Math.max(250,rect.height||460);const dpr=Math.min(window.devicePixelRatio||1,2);this.w=width;this.h=height;this.el.width=Math.round(width*dpr);this.el.height=Math.round(height*dpr);this.ctx.setTransform(dpr,0,0,dpr,0,0);this.draw()}
+ bound(){this.el.addEventListener('pointerdown',e=>{this.drag={x:e.clientX,y:e.clientY,started:false};this.el.setPointerCapture?.(e.pointerId)});this.el.addEventListener('pointermove',e=>{const r=this.el.getBoundingClientRect();const p={x:e.clientX-r.left,y:e.clientY-r.top};if(this.drag){const dx=e.clientX-this.drag.x,dy=e.clientY-this.drag.y;this.drag.x=e.clientX;this.drag.y=e.clientY;if(Math.abs(dx)+Math.abs(dy)>1)this.drag.started=true;if(this.tool==='pan'){this.pan.x+=dx;this.pan.y+=dy}else{this.yaw+=dx*.008;this.tilt=Math.max(.04,Math.min(1.55,this.tilt+dy*.006));this.mode='3d'}this.draw();return}if(this.researcher)this.hit(p.x,p.y)});this.el.addEventListener('pointerup',e=>{const r=this.el.getBoundingClientRect();if(this.researcher&&!this.drag?.started)this.hit(e.clientX-r.left,e.clientY-r.top,true);this.drag=null});this.el.addEventListener('pointercancel',()=>this.drag=null);this.el.addEventListener('wheel',e=>{e.preventDefault();this.zoom=Math.max(.55,Math.min(2.2,this.zoom*(e.deltaY>0?.93:1.07)));this.draw()},{passive:false});}
+ setView(mode){this.mode=mode;this.yaw=mode==='plan'?0:mode==='section'?.02:-.12;this.tilt=mode==='plan'?1.570796:mode==='section'?.08:.59;this.pan={x:0,y:0};this.draw()}
+ reset(){this.yaw=-.12;this.tilt=.59;this.zoom=1;this.pan={x:0,y:0};this.mode='3d';this.draw()}
+ project(p){const cos=Math.cos(this.yaw),sin=Math.sin(this.yaw);const x=p.x*cos-p.y*sin;const y=p.x*sin+p.y*cos;const scale=Math.min(this.w/475,this.h/390)*this.zoom;return{x:this.w*.5+this.pan.x+x*scale,y:this.h*.60+this.pan.y-(y*Math.sin(this.tilt)+p.z*Math.cos(this.tilt))*scale}}
+ line(a,b,color,width=1,dashes=[]){const c=this.ctx,p=this.project(a),q=this.project(b);c.save();c.strokeStyle=color;c.lineWidth=width;c.setLineDash(dashes);c.beginPath();c.moveTo(p.x,p.y);c.lineTo(q.x,q.y);c.stroke();c.restore()}
+ polygon(pts,fill,stroke=null,width=1){const c=this.ctx;c.beginPath();pts.forEach((pt,i)=>{const q=this.project(pt);if(i===0)c.moveTo(q.x,q.y);else c.lineTo(q.x,q.y)});c.closePath();if(fill){c.fillStyle=fill;c.fill()}if(stroke){c.strokeStyle=stroke;c.lineWidth=width;c.stroke()}}
+ circle(p,r,fill,stroke){const v=this.project(p),c=this.ctx;c.beginPath();c.arc(v.x,v.y,r,0,2*Math.PI);c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=1.8;c.stroke()}return v}
+ text(str,p,color='#334541',offsetY=0,size=12){const v=this.project(p),c=this.ctx;c.fillStyle=color;c.font=`600 ${size}px Georgia, serif`;c.textAlign='center';c.fillText(str,v.x,v.y+offsetY)}
+ gradientTriangle(a,b,c,colors,alpha=.15,N=20){for(let i=0;i<N;i++){for(let j=0;j<N-i;j++){const p=(x,y)=>pointBlend(a,b,c,x/N,y/N,1-(x+y)/N);const coords=[[i,j+1],[i+1,j],[i,j]];const midx=(3*i+1)/3,midy=(3*j+1)/3;const col=mix(colors,[midx/N,midy/N,1-(midx+midy)/N],alpha);this.polygon(coords.map(([u,v])=>p(u,v)),col);if(i+j+1<N){const coords2=[[i+1,j],[i,j+1],[i+1,j+1]];const midx2=(3*i+2)/3,midy2=(3*j+2)/3;this.polygon(coords2.map(([u,v])=>p(u,v)),mix(colors,[midx2/N,midy2/N,1-(midx2+midy2)/N],alpha))}}}}
+ hit(x,y,click=false){let closest=null,dist=Infinity;this.hotspots.forEach(v=>{const d=Math.hypot(v.p.x-x,v.p.y-y);if(d<Math.max(12,v.radius+7)&&d<dist){dist=d;closest=v}});if(closest){this.el.style.cursor='pointer';if(lastInspected!==closest.record.id||click){lastInspected=closest.record.id;showInspection(closest.record)}}else{this.el.style.cursor='grab';if(!click&&lastInspected!==null){lastInspected=null;clearInspection()}}}
+ draw(){if(!this.w||!this.h)return;const c=this.ctx;c.clearRect(0,0,this.w,this.h);this.hotspots=[];
+  // Architectural tetrahedral skin, a translucent visual envelope; data are the stems and dots.
+  const A=VERTS[0],B=VERTS[1],C=VERTS[2],K={x:0,y:0,z:205};
+  this.gradientTriangle(B,C,A,[COLORS[1],COLORS[2],COLORS[0]],.43,25);
+  if(this.mode!=='plan'){
+   this.gradientTriangle(B,C,K,[COLORS[1],COLORS[2],[175,179,191]],.115,15);
+   this.gradientTriangle(A,B,K,[COLORS[0],COLORS[1],[165,177,184]],.095,15);
+   this.gradientTriangle(A,C,K,[COLORS[0],COLORS[2],[165,177,184]],.087,15);
+   [A,B,C].forEach(v=>this.line(v,K,'rgba(129,143,138,.25)',1));
+  }
+  this.polygon([A,B,C],null,'rgba(111,139,137,.42)',1.5);
+  // Four nested gradient contours show the rating increments.
+  for(let t=1;t<=4;t++){const ring=VERTS.map(v=>({x:v.x*(t-1)/3,y:v.y*(t-1)/3,z:0}));if(t>1)this.polygon(ring,null,'rgba(109,133,124,.15)',1);}
+  VERTS.forEach((v,i)=>{this.line({x:0,y:0,z:0},v,brighten(COLORS[i],.81),2);for(let t=1;t<=4;t++){const q={x:v.x*(t-1)/3,y:v.y*(t-1)/3,z:0};this.circle(q,t===4?5:2.7,brighten(COLORS[i],t===4?.99:.73));if(t>1){const m=Math.hypot(v.x,v.y);this.text(String(t),{x:q.x-v.y/m*11,y:q.y+v.x/m*11,z:0},brighten(COLORS[i],.92),-3,10)}}
+   this.text(['FAMILY','FINANCIAL','EVALUATION'][i],{x:v.x*1.22,y:v.y*1.15,z:0},brighten(COLORS[i],.99),i===0?-9:16,this.w<450?11:12)
+  });
+  this.text('1',{x:-7,y:9,z:0},'#8a887d',-2,10);
+  this.line({x:0,y:0,z:0},K,'rgba(179,158,118,.50)',1.2,[4,5]);
+  this.text('TOTAL PRESSURE',K,'#9d8357',-8,10);
+  // Draw genuine records only; keep highlighted respondent last for visibility.
+  const submitted=state.records.slice();const me=submitted.find(r=>r.id===this.selection);const others=submitted.filter(r=>r!==me);
+  const ordered=me?[...others,me]:others;
+  for(const r of ordered){const m=metrics(r);const special=r===me;const p1=this.project(m.top);this.line(m.base,m.top,special?'rgba(196,74,63,.7)':'rgba(111,120,117,.23)',special?2:1,[3,4]);this.circle(m.base,special?4:2.8,special?'rgba(188,76,67,.40)':'rgba(103,128,126,.17)');const color=special?'#c95045':'#818e8a';const rad=special?8:5.8;this.circle(m.top,rad,color,'#fffdfa');this.hotspots.push({p:p1,record:r,all:submitted,radius:rad})}
+  if(ordered.length===0){const p=this.project({x:0,y:0,z:82});c.save();c.fillStyle='#667e75';c.textAlign='center';c.font='italic 17px Georgia,serif';c.fillText('Waiting for the first response',p.x,p.y);c.font='12px Arial,sans-serif';c.fillText('Only submitted student responses will appear here',p.x,p.y+25);c.restore()}
+ }
+}
+function controlBar(root,chart){root.innerHTML='';[['3D','3d'],['Plan','plan'],['Section','section'],['+', 'zoomIn'],['−','zoomOut'],['↻','reset'],['Pan','pan'],['Orbit','orbit']].forEach(([label,action])=>{const b=document.createElement('button');b.type='button';b.className='tool';b.textContent=label;b.dataset.action=action;if(action==='3d'||action==='orbit')b.classList.add('active');b.onclick=()=>{if(['3d','plan','section'].includes(action)){chart.setView(action);root.querySelectorAll('button').forEach(x=>{if(['3d','plan','section'].includes(x.dataset.action))x.classList.toggle('active',x===b)})}else if(action==='zoomIn'||action==='zoomOut'){chart.zoom=Math.max(.55,Math.min(2.25,chart.zoom*(action==='zoomIn'?1.16:1/1.16)));chart.draw()}else if(action==='reset'){chart.reset();root.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.action==='3d'||x.dataset.action==='orbit'))}else {chart.tool=action;root.querySelectorAll('button').forEach(x=>{if(['pan','orbit'].includes(x.dataset.action))x.classList.toggle('active',x===b)})}};root.appendChild(b)})}
+function renderQuestion(){const i=questionIndex;$('qProgressText').textContent=`Question ${i+1} of 9`;$('qPercent').textContent=`${Math.round((i+1)/9*100)}%`;$('qBar').style.width=`${(i+1)/9*100}%`;$('qNumber').textContent=`QUESTION ${String(i+1).padStart(2,'0')}`;$('qText').textContent=QUESTIONS[i];$('btnBack').textContent=i===0?'← Participation info':'← Back';$('btnNext').textContent=i===8?'Submit and lock my responses ✓':'Next question →';$('qError').hidden=true;
+ const wrap=$('options');wrap.replaceChildren();LABELS.forEach((label,idx)=>{const control=document.createElement('label');control.className='answer';const radio=document.createElement('input');radio.type='radio';radio.name='choice';radio.value=String(idx+1);radio.checked=answers[i]===idx+1;const num=document.createElement('span');num.className='num';num.textContent=String(idx+1);const text=document.createElement('span');text.textContent=label;control.append(radio,num,text);wrap.appendChild(control)});
+ window.scrollTo({top:0,behavior:'auto'});
+}
+function updateStep(step){['stepConsent','stepQuestions','stepComplete'].forEach((id,i)=>{$(id).classList.toggle('active',i===step);$(id).classList.toggle('done',i<step)});$('formKicker').textContent=['Study participation','Participant questionnaire','Submission completed'][step]}
+function showQuestion(){updateStep(1);$('consentPane').hidden=true;$('questionPane').hidden=false;renderQuestion()}
+function submit(){if(state.submitted){showResult();return}const record={type:'participant',id:crypto?.randomUUID?.()||('r_'+Date.now()+'_'+Math.random().toString(36).slice(2)),answers:answers.slice(),created_at:new Date().toISOString()};if(!validRecord(record)){alert('Please complete all nine questions.');return}state.records.push(record);state.submitted=record.id;commit();updateStep(2);$('surveyArea').hidden=true;$('studentResult').hidden=false;initCharts();studentChart.selection=record.id;successChart.selection=record.id;studentChart.draw();successChart.draw();$('successBackdrop').hidden=false;modalOpen=true;$('btnExplore').focus();}
+function showResult(){const record=state.records.find(r=>r.id===state.submitted);if(!record){state.submitted=null;commit();showStudent();return}$('surveyArea').hidden=true;$('studentResult').hidden=false;initCharts();studentChart.selection=record.id;successChart.selection=record.id;setTimeout(()=>{studentChart.size();successChart.size()},50)}
+function showStudent(){activeView='student';$('studentScreen').hidden=false;$('researchScreen').hidden=true;$('tabStudent').classList.add('active');$('tabResearch').classList.remove('active');if(state.submitted)showResult();else{$('surveyArea').hidden=false;$('studentResult').hidden=true}setTimeout(()=>studentChart?.size(),40)}
+function showResearch(){activeView='research';$('studentScreen').hidden=true;$('researchScreen').hidden=false;$('tabStudent').classList.remove('active');$('tabResearch').classList.add('active');initCharts();updateAll();setTimeout(()=>researchChart?.size(),55)}
+function initCharts(){if(!studentChart){studentChart=new Triangle($('resultCanvas'));controlBar($('resultTools'),studentChart)}if(!researchChart){researchChart=new Triangle($('researchCanvas'),{researcher:true});controlBar($('researchTools'),researchChart)}if(!successChart){successChart=new Triangle($('successCanvas'))}studentChart.selection=state.submitted;successChart.selection=state.submitted;}
+function inspectValues(r){$('inspectHead').textContent='Anonymous participant';$('inspectEmpty').hidden=true;$('inspectDetails').hidden=false;$('inspectTime').textContent=timestamp(r.created_at);$('inspectFamily').textContent=`${r.answers[0]} / 4`;$('inspectFinancial').textContent=`${r.answers[1]} / 4`;$('inspectAcademic').textContent=`${r.answers[2]} / 4`;$('inspectTotal').textContent=`${metrics(r).total} / 12`;const m=metrics(r);const overlapping=state.records.filter(p=>{const mp=metrics(p);return Math.abs(mp.top.x-m.top.x)<.001&&Math.abs(mp.top.y-m.top.y)<.001&&Math.abs(mp.top.z-m.top.z)<.001});$('inspectOverlapsWrap').hidden=overlapping.length<2;$('inspectOverlaps').textContent=overlapping.length>1?overlapping.map(p=>timestamp(p.created_at)).join(' · '):''}
+function showInspection(r){inspectValues(r)}
+function clearInspection(){$('inspectHead').textContent='Select a point';$('inspectEmpty').hidden=false;$('inspectDetails').hidden=true}
+function updateAll(){const n=state.records.length;$('statCount').textContent=n;$('statFamily').textContent=average(0);$('statFinancial').textContent=average(1);$('statAcademic').textContent=average(2);$('statTotal').textContent=n?(state.records.reduce((s,r)=>s+metrics(r).total,0)/n).toFixed(2):'—';$('researchUpdated').textContent=n?`Last submission: ${timestamp(state.records[n-1].created_at)}`:'No submissions yet';if(researchChart)researchChart.draw();if(studentChart)studentChart.draw();if(successChart)successChart.draw()}
+function resetStudy(){if(!confirm('Delete all LOCAL test responses and unlock this browser for a new test? This cannot be undone.'))return;state={records:[],submitted:null};answers=Array(9).fill(null);consented=false;questionIndex=0;$('consentCheck').checked=false;$('consentPane').hidden=false;$('questionPane').hidden=true;clearInspection();commit();showStudent();status('Test records cleared. Survey is ready for a fresh run.')}
+function exportCSV(){const rows=[['recorded_at_utc','family','financial','evaluation','avoided_question','presented_as_settled','delayed_feedback','concealment_helped','concealment_hindered','shared_unfinished_idea'],...state.records.map(r=>[r.created_at,...r.answers])];const csv=rows.map(row=>row.map(val=>`"${String(val).replace(/"/g,'""')}"`).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='THE_SEAM_anonymous_test_responses.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+function externalSync(){const incoming=getStored();const changed=JSON.stringify(incoming)!==JSON.stringify(state);if(!changed)return;state=incoming;updateAll();if(activeView==='student'&&state.submitted&&!$('studentResult').hidden)showResult()}
+$('tabStudent').onclick=showStudent;$('tabResearch').onclick=showResearch;$('btnOpenWindow').onclick=()=>{const url=location.href.split('#')[0]+'#researcher';const popup=window.open(url,'seam_researcher','width=1330,height=900');if(!popup)status('Popup blocked. Open this same HTML file in a second browser tab, then choose Researcher.',true)};
+$('btnStart').onclick=()=>{if(!$('consentCheck').checked){$('consentError').hidden=false;$('consentCheck').focus();return}$('consentError').hidden=true;consented=true;questionIndex=0;showQuestion()};
+$('btnBack').onclick=()=>{if(questionIndex===0){updateStep(0);$('questionPane').hidden=true;$('consentPane').hidden=false}else{questionIndex--;renderQuestion()}};
+$('btnNext').onclick=()=>{const checked=document.querySelector('input[name="choice"]:checked');if(!checked){$('qError').hidden=false;return}answers[questionIndex]=Number(checked.value);if(questionIndex===8){if(!consented){alert('Consent was not recorded. Please return to the beginning.');return}submit()}else{questionIndex++;renderQuestion()}};
+$('options').addEventListener('change',()=>{$('qError').hidden=true});
+$('btnExplore').onclick=()=>{$('successBackdrop').hidden=true;modalOpen=false;setTimeout(()=>studentChart?.size(),70)};
+$('btnExport').onclick=exportCSV;$('btnReset').onclick=resetStudy;
+state=getStored();
+try{if('BroadcastChannel'in window){syncChannel=new BroadcastChannel(CHANNEL);syncChannel.onmessage=externalSync}}catch(e){}
+window.addEventListener('storage',e=>{if(e.key===STORAGE)externalSync()});
+window.addEventListener('resize',()=>{studentChart?.size();researchChart?.size();successChart?.size()});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&modalOpen){$('btnExplore').click()}});
+initCharts();updateAll();if(location.hash==='#researcher')showResearch();else showStudent();
+status(storageAvailable?'Interactive test ready · no sample responses': 'Interactive test ready · browser storage restricted',!storageAvailable);
+})();
+</script>
+</body></html>
