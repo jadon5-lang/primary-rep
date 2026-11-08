@@ -1,0 +1,9 @@
+# Never commit credentials, local previews, or installed packages.
+.env
+.env.*
+!.env.example
+.netlify/
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
