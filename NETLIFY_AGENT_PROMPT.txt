@@ -1,0 +1,7 @@
+UPDATE MY EXISTING NETLIFY PROJECT `the-seam-survey` IN PLACE. Do not create another site or change its public URL: https://the-seam-survey.netlify.app/ . Preserve the current survey questions and the refined ivory/charcoal/gold UI and blue/teal/copper blended 3D pyramid.
+
+Use the attached V9 source ZIP as the starting code. Deploy the ENTIRE project, including netlify.toml, npm dependencies, Netlify Function, and public/index.html, not only the HTML. In production, reuse the existing site-wide store `the-seam-verified-responses-v8`. Do not seed or reset data. Set the Netlify environment variable `SEAM_RESEARCHER_PASSWORD` securely (prompt me privately; never insert it into source code). Publish only after build passes.
+
+Functional acceptance tests using two browsers/devices: check /api/health reports V9; submit all nine answers from A and B; both receive distinct anonymous 3-digit IDs; each gets success popup with red dot; group dots remain hidden until there are five real submissions; the protected findings view at /?report=1 shows A and B, updating at 3-second intervals; Excel export contains both rows and all Q1–Q9; repeat A submission does not generate another row; the public map doesn't reveal others' IDs or timestamps; reporter hover shows EST/EDT.
+
+If tests fail, leave the old site running and tell me what must be fixed. Do not fabricate data, change domains, add demo users, or expose the researcher password.
