@@ -31,7 +31,7 @@ test('independent participants accumulate unique 3-digit IDs',async()=>{
  const priv=await call('research','GET',null,{authorization:'Bearer '+secret});
  const body=await priv.json();assert.equal(body.records.length,7);
  assert.equal(body.summary.count,7);
- assert.ok(body.records.every(d=>d.survey_version==='V10'&&Array.isArray(d.answers)&&d.answers.length===9));
+ assert.ok(body.records.every(d=>d.survey_version==='V10.2'&&Array.isArray(d.answers)&&d.answers.length===9));
  assert.equal(body.summary.dimensions.length,9);
  assert.equal(body.summary.dimensions[0].counts.reduce((a,b)=>a+b,0),7);
 });
@@ -59,7 +59,7 @@ test('descriptive report does not claim causality and preserves empty dataset',(
 });
 
 test('equal primary-axis means are called out as a tie',()=>{
- const r={type:'participant',id:'100',survey_version:'V10',answers:[80,80,80,20,30,30,20,20,20],created_at:new Date().toISOString()};
+ const r={type:'participant',id:'100',survey_version:'V10.2',answers:[80,80,80,20,30,30,20,20,20],created_at:new Date().toISOString()};
  const stats=summarize([r]);assert.match(stats.highest_mean_pressure,/tied/);
 });
 test('insufficient group size does not disclose other points',async()=>{
@@ -86,7 +86,7 @@ test('V10 zero is a valid intentional answer and 100 is the maximum', async () =
  const res=await handleSeamRequest(request,()=>fresh,{password:secret});
  assert.equal(res.status,201);
  const row=(await res.json()).record;
- assert.equal(row.survey_version,'V10');
+ assert.equal(row.survey_version,'V10.2');
  assert.deepEqual(point(row),{x:0,y:0,z:0,total:0});
  const max=point({answers:[100,100,100]});
  assert.equal(max.z,205);assert.equal(max.total,300);
@@ -167,8 +167,8 @@ test('Excel preserves blanks for skipped questions and safe formulas for missing
  const ExcelJS=(await import('exceljs')).default;
  const now=new Date().toISOString();
  const rows=[
-  {id:'110',type:'participant',survey_version:'V10',created_at:now,answers:[0,100,50,20,30,40,50,60,70]},
-  {id:'111',type:'participant',survey_version:'V10',created_at:now,answers:[null,100,50,null,30,40,50,60,70]}
+  {id:'110',type:'participant',survey_version:'V10.2',created_at:now,answers:[0,100,50,20,30,40,50,60,70]},
+  {id:'111',type:'participant',survey_version:'V10.2',created_at:now,answers:[null,100,50,null,30,40,50,60,70]}
  ];
  const wbytes=await makeWorkbook(rows,summarize(rows));const wb=new ExcelJS.Workbook();
  await wb.xlsx.load(wbytes);
@@ -179,4 +179,44 @@ test('Excel preserves blanks for skipped questions and safe formulas for missing
  assert.ok(sh.getCell('M3').value.result==null||sh.getCell('M3').value.result==='');
  assert.match(sh.getCell('P3').value.formula,/COUNT\(D3:F3\)=3/);
  assert.equal(wb.getWorksheet('Findings Summary').getCell('J15').value,0);
+});
+
+test('V10.2 presents all nine survey items with appropriate question-specific slider anchors', async () => {
+ const fs=await import('node:fs/promises');
+ const html=await fs.readFile(new URL('../public/index.html',import.meta.url),'utf8');
+ const questionMatch=html.match(/const QUESTIONS=(\[[^\n]*\]);/);
+ const scalesMatch=html.match(/const SCALES=(\[[^\n]*\]);/);
+ assert.ok(questionMatch&&scalesMatch,'Questions and scales must be present in the UI');
+ const questions=JSON.parse(questionMatch[1]),scales=JSON.parse(scalesMatch[1]);
+ assert.equal(questions.length,9);
+ assert.equal(scales.length,9);
+ assert.deepEqual(scales.map(s=>s.kind),['Influence','Dependency','Influence','Frequency','Frequency','Frequency','Immediate relief','Delayed difficulty','Willingness']);
+ assert.deepEqual(scales.map(s=>s.low),['No influence','Not dependent','No influence','Never','Never','Never','No relief','No difficulty','Not willing']);
+ assert.deepEqual(scales.map(s=>s.high),['Decisive influence','Completely dependent','Decisive influence','Very often','Very often','Very often','Substantial relief','Severe difficulty','Fully willing']);
+ assert.ok(questions.slice(3,6).every(q=>q.startsWith('How often')));
+ assert.ok(questions.slice(6,8).every(q=>q.startsWith('When you kept an uncertainty private')));
+ assert.match(html,/ends\.replaceChildren\(\)/);
+ assert.match(html,/meta\.textContent=scale.kind/);
+ assert.match(html,/Your responses are saved/);
+ assert.match(html,/id="studentResult"[^>]*hidden/);
+ assert.match(html,/id="successBackdrop"[^>]*hidden/);
+ assert.match(html,/The diagram remains hidden until after you submit/);
+ assert.match(html,/data.study!=='THE SEAM V10.2'/);
+});
+test('V10.2 research documents clarify that frequency sliders are not identical to pressure measures', async () => {
+ const {makeWorkbook}=await import('../lib/workbook.mjs');
+ const ExcelJS=(await import('exceljs')).default;
+ const rows=[{id:'110',survey_version:'V10.2',answers:[80,90,70,35,50,75,20,60,100],created_at:new Date().toISOString()}];
+ const b=await makeWorkbook(rows,summarize(rows));const wb=new ExcelJS.Workbook();await wb.xlsx.load(b);
+ const q=wb.getWorksheet('Question Key');
+ assert.match(q.getCell('C2').value,/Influence/);
+ assert.match(q.getCell('C3').value,/Dependency/);
+ assert.match(q.getCell('C5').value,/Frequency/);
+ assert.match(q.getCell('C8').value,/Immediate relief/);
+ assert.match(q.getCell('C9').value,/Delayed difficulty/);
+ assert.match(q.getCell('C10').value,/Willingness/);
+ assert.equal(wb.getWorksheet('Anonymous Responses').getCell('S2').value,'V10.2');
+ const stats=summarize(rows);
+ assert.match(stats.method_note,/question-specific anchors/);
+ assert.match(stats.method_note,/not percentages/);
 });
