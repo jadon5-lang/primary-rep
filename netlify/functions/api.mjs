@@ -2,7 +2,7 @@ import { getStore, getDeployStore } from '@netlify/blobs';
 import { handleSeamRequest } from '../../lib/handlers.mjs';
 import { storageScopeFor } from '../../lib/deploy-safety.mjs';
 
-// V10 has its own site-wide store, preserving all earlier V9 responses separately.
+// V10.1 uses a distinct store because the 0–100 prompts now measure statement applicability, not frequency. Earlier V10 and V9 pilot responses remain separate.
 // Nonproduction previews use deploy-specific stores, so tests cannot contaminate the live study.
 // Unknown contexts fail closed.
 export default async function handler(request, context) {
@@ -17,7 +17,7 @@ export default async function handler(request, context) {
     });
   }
   const store = () => scope === 'site-wide-production'
-    ? getStore({ name: 'the-seam-verified-responses-v10', consistency: 'strong' })
-    : getDeployStore({ name: 'the-seam-verified-responses-v10-preview', consistency: 'strong' });
+    ? getStore({ name: 'the-seam-verified-responses-v10-1', consistency: 'strong' })
+    : getDeployStore({ name: 'the-seam-verified-responses-v10-1-preview', consistency: 'strong' });
   return handleSeamRequest(request, store);
 }
