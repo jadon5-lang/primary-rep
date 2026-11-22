@@ -220,3 +220,20 @@ test('V10.2 research documents clarify that frequency sliders are not identical 
  assert.match(stats.method_note,/question-specific anchors/);
  assert.match(stats.method_note,/not percentages/);
 });
+
+test('V10.2 architectural slider shows a 50 preview with gold-left ghost-right track, no intermediate ticks', async () => {
+ const fs=await import('node:fs/promises');
+ const html=await fs.readFile(new URL('../public/index.html',import.meta.url),'utf8');
+ assert.match(html,/\.question-text\{[^}]*color:#143d33/);
+ assert.match(html,/\.slider-input\{[^}]*background:linear-gradient\(90deg,#b28b52/);
+ assert.match(html,/rgba\(176,172,161,\.23\)/);
+ assert.match(html,/\.slider-input::-webkit-slider-thumb\{[^}]*width:31px;height:38px/);
+ assert.match(html,/\.slider-float\.preview/);
+ assert.match(html,/slider\.value=answers\[i\]\?\?50/);
+ assert.match(html,/readout\.textContent=skipped\[i\]\?'Skipped':answers\[i\]===null\?'50'/);
+ assert.match(html,/const width=rail\.clientWidth/);
+ assert.match(html,/slider\.style\.setProperty\('--fill',value\+'%'\)/);
+ assert.doesNotMatch(html,/className='slider-scale'/);
+ assert.doesNotMatch(html,/ticks\.innerHTML/);
+ assert.match(html,/id="studentResult"[^>]*hidden/);
+});
