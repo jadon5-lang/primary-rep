@@ -72,6 +72,17 @@ button:focus-visible,input:focus-visible{outline:3px solid #559d91;outline-offse
 .answer input{width:19px;height:19px;margin:0;accent-color:#9d7942;flex:0 0 auto}
 .answer .num{font:normal 19px Georgia,serif;width:17px;flex:0 0 auto}
 .answer span:last-child{font-size:14px}
+.slider-card{background:#fffcf7;border:1px solid #e0d5c2;border-radius:16px;padding:23px 22px 19px;margin:20px 0 28px}
+.slider-top{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.slider-kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8c784f;font-weight:800}
+.slider-readout{font:normal 42px/1.1 Georgia,serif;color:var(--dark);font-variant-numeric:tabular-nums}
+.slider-input{width:100%;margin:27px 0 14px;height:11px;accent-color:#ad8952;cursor:pointer;touch-action:pan-y}
+.slider-labels{display:flex;justify-content:space-between;gap:14px;font-size:12px;color:#68766f;font-weight:700}
+.slider-scale{display:flex;justify-content:space-between;color:#969287;font-size:10px;margin-top:7px}
+.slider-adjust{display:flex;align-items:center;gap:10px;margin-top:24px;flex-wrap:wrap;font-size:12px;color:#5b6963}
+.slider-number{width:115px;max-width:100%;font-size:16px;padding:9px 12px;border:1px solid #cfc5b6;border-radius:8px;font-variant-numeric:tabular-nums}
+.slider-hint{margin-top:12px;font-size:11px;color:#778079}
+.slider-input:focus-visible,.slider-number:focus-visible{outline:3px solid #c8a46d;outline-offset:3px}
 .actions{display:flex;justify-content:space-between;gap:14px;margin-top:22px;align-items:center}
 .btn{border:1px solid #d9d0c1;border-radius:9px;padding:12px 19px;background:#f9f5ed;color:#34423d;font-weight:750;font-size:13px;min-height:46px}
 .btn.primary{border-color:var(--gold);background:linear-gradient(130deg,#a88246,#b59560);color:white;box-shadow:0 4px 10px #7b5a3420}
@@ -183,7 +194,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #559d91;outline-offse
  <div class="survey-layout" id="surveyArea">
   <aside class="intro-panel"><div class="upper">Participant experience</div><h2>Academic choices<br>and experiences.</h2><p>A short, anonymous questionnaire about decisions made during the last four weeks of classes.</p><div class="steps" aria-label="Survey progress"><div id="stepConsent" class="step active"><span class="bubble">1</span>Consent</div><div id="stepQuestions" class="step"><span class="bubble">2</span>Survey</div><div id="stepComplete" class="step"><span class="bubble">3</span>Complete</div></div><span class="intro-decoration"></span></aside>
   <section class="card form-shell"><div class="form-tag upper" id="formKicker">Study participation</div><div id="consentPane"><div class="form-head"><div><h2>Before you begin</h2><p class="muted">Please review the information below.</p></div><span class="pill">About 3 minutes</span></div><div id="consentNotice" class="notice"><b>Purpose:</b> This survey explores academic decisions, feedback, expectations, and experiences of uncertainty among adult higher-education students.<br><br><b>Participation:</b> Taking part is voluntary. You can leave before submitting, without recording your answers.<br><br><b>Privacy:</b> Nine numerical responses and a server-recorded timestamp are saved in shared storage. No names, email addresses, or student IDs are requested. Hosting providers may keep technical access logs. Researchers can inspect anonymous individual scores and times.<br><br><b>Pilot:</b> This software is for testing; formal thesis recruitment requires your institution’s approval and approved consent wording.</div><label class="consent"><input id="consentCheck" type="checkbox"><span>I am at least 18 years old, have read the information above, and voluntarily agree to take part in this test survey.</span></label><div id="consentError" class="error-msg" hidden>Please check the participation box to continue.</div><div class="actions"><span class="muted" style="font-size:12px">No identifying information requested.</span><button id="btnStart" class="btn primary" type="button">Begin survey →</button></div></div>
-  <div id="questionPane" hidden><div class="form-head"><div><h2>Student experiences</h2><p class="muted">Select the option closest to what occurred.</p></div><span class="pill">Anonymous</span></div><div class="progress-top"><span id="qProgressText">Question 1 of 9</span><span id="qPercent">11%</span></div><div class="progress"><div id="qBar"></div></div><div id="qNumber" class="q-index">QUESTION 01</div><h3 id="qText" class="question-text"></h3><div class="period">During the past four weeks of classes</div><div id="options" class="answers" role="radiogroup" aria-label="Frequency of experience"></div><div id="qError" class="error-msg" hidden>Choose one response to continue.</div><div class="actions"><button id="btnBack" class="btn" type="button">← Back</button><button id="btnNext" class="btn primary" type="button">Next question →</button></div><p class="readme-line">Your answers are not plotted or shown on the graph until you submit.</p></div></section>
+  <div id="questionPane" hidden><div class="form-head"><div><h2>Student experiences</h2><p class="muted">Move the slider to rate each experience from 0 to 100. You can also type a number.</p></div><span class="pill">Anonymous</span></div><div class="progress-top"><span id="qProgressText">Question 1 of 9</span><span id="qPercent">11%</span></div><div class="progress"><div id="qBar"></div></div><div id="qNumber" class="q-index">QUESTION 01</div><h3 id="qText" class="question-text"></h3><div class="period">During the past four weeks of classes</div><div id="options" class="slider-card" aria-label="Frequency of experience on a 0 to 100 scale"></div><div id="qError" class="error-msg" hidden>Move the slider or type a score to continue.</div><div class="actions"><button id="btnBack" class="btn" type="button">← Back</button><button id="btnNext" class="btn primary" type="button">Next question →</button></div><p class="readme-line">Your answers are not plotted or shown on the graph until you submit.</p></div></section>
  </div>
  <div id="studentResult" class="card student-result" hidden><div class="locked-top">✓ Survey completed. Your answers have been recorded and locked.</div><div class="upper form-tag">Your spatial position · <span id="resultParticipantId">ANONYMOUS ID —</span></div><h2>You are now part of the diagram.</h2><p class="muted" id="resultExplanation">Your response appears as the red marker. Other anonymous participants appear in gray once at least five people have submitted. Rotate, pan, or zoom to explore; answers cannot be changed.</p><div class="chart-card"><div class="chart-bar"><h3>Three pressures · One position</h3><div class="tools" id="resultTools"></div></div><div class="chart-region"><div class="graph-wrap"><canvas id="resultCanvas" class="chartcanvas" aria-label="Three dimensional triangular pressure diagram"></canvas><div class="graph-note"><span class="color" style="background:var(--red)"></span> Your position <span class="color" style="background:#8b9793;margin-left:13px"></span> Other anonymous submissions</div></div></div></div><p class="readme-line">You can revisit this result from this browser. The graph refreshes with new anonymous submissions automatically.</p></div>
 </div>
@@ -207,21 +218,21 @@ button:focus-visible,input:focus-visible{outline:3px solid #559d91;outline-offse
     <div class="finding-kpis" id="findingKpis"></div>
     <h3 class="serif" id="researchAnalysis">Interpretation of the current dataset</h3><div id="findingNarrative" class="finding-narrative">There are no completed responses yet. Once a student submits, this report will populate automatically.</div>
     <h3 class="serif">Question-by-question distribution</h3>
-    <p class="muted" style="font-size:12px">Each row shows the number of respondents selecting Never (1), Rarely (2), Sometimes (3), and Often (4).</p>
-    <div class="table-scroll"><table class="report-table" id="distributionTable"><thead><tr><th>Measure</th><th>Mean</th><th>1 · Never</th><th>2 · Rarely</th><th>3 · Sometimes</th><th>4 · Often</th><th>Sometimes/Often</th></tr></thead><tbody></tbody></table></div>
+    <p class="muted" style="font-size:12px">Each row groups 0–100 slider ratings into four equal 25-point ranges. Original decimal responses remain available in the participant dataset and downloads.</p>
+    <div class="table-scroll"><table class="report-table" id="distributionTable"><thead><tr><th>Measure</th><th>Mean</th><th>0–24.9</th><th>25–49.9</th><th>50–74.9</th><th>75–100</th><th>50–100 (%)</th></tr></thead><tbody></tbody></table></div>
     <h3 class="serif" id="researchResponses">Participant dataset</h3><p class="muted" style="font-size:12px">One row per completed submission. IDs are anonymous 3-digit research codes, not student identification numbers. Select any row to inspect that point on the pyramid.</p>
     <div class="table-scroll"><table class="report-table response-table" id="responsesTable"><thead><tr><th>ID</th><th>Submitted · Eastern</th><th>Family</th><th>Finance</th><th>Evaluation</th><th>Pressure total</th><th>Concealment Q4–Q6</th></tr></thead><tbody></tbody></table></div>
-    <p class="method-note">Research note: these results are exploratory, self-reported four-point responses. The three plotted pressures are not a clinical scale, and correlations do not establish causation. The minimum-visibility rule for the participant group plot remains five submissions. Participant IDs are limited to 100–999 (900 unique codes).</p>
+    <p class="method-note">Research note: these results are exploratory, self-reported 0–100 slider responses recorded to one decimal place. The three plotted pressures are not a clinical scale, and correlations do not establish causation. The minimum-visibility rule for the participant group plot remains five submissions. Participant IDs are limited to 100–999 (900 unique codes).</p>
    </div>
   </section>
  </div>
 </div>
-<div id="successBackdrop" class="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="successHeading"><div class="modal-top"><div class="modal-icon">✓</div><div class="upper" style="color:#9c8153">Survey complete</div><h2 id="successHeading">Submission complete.</h2><p>Thank you for participating. Your answers are now locked. <strong id="modalParticipantId">Your anonymous ID will appear here.</strong> The red point shows how your three survey ratings combine. Its elevation represents the total of those ratings.</p></div><div class="modal-chart"><canvas id="successCanvas" class="chartcanvas" aria-label="Your point among the other completed anonymous responses"></canvas></div><div class="modal-tip" id="modalTip">● &nbsp; Your red point is shown alongside other anonymous responses once at least five participants have submitted. The colors blend between <b>family (blue)</b>, <b>financial (teal)</b>, and <b>academic evaluation (copper)</b>.</div><div class="modal-bottom"><div class="debrief"><b>About this research:</b> The study examines how family expectations, financial circumstances, and evaluation may influence whether students share uncertainty. The triangle shows the balance of three self-reported influences in plan and their total score in height. A high score is not a clinical measure of stress. It is an exploratory visualization, not a psychological diagnosis.</div><button type="button" id="btnExplore" class="btn primary">Explore the 3D diagram →</button></div></section></div>
+<div id="successBackdrop" class="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="successHeading"><div class="modal-top"><div class="modal-icon">✓</div><div class="upper" style="color:#9c8153">Survey complete</div><h2 id="successHeading">Submission complete.</h2><p>Thank you for participating. Your answers are now locked. <strong id="modalParticipantId">Your anonymous ID will appear here.</strong> The red point shows how your three 0–100 ratings combine. Its elevation represents the total of those ratings.</p></div><div class="modal-chart"><canvas id="successCanvas" class="chartcanvas" aria-label="Your point among the other completed anonymous responses"></canvas></div><div class="modal-tip" id="modalTip">● &nbsp; Your red point is shown alongside other anonymous responses once at least five participants have submitted. The colors blend between <b>family (blue)</b>, <b>financial (teal)</b>, and <b>academic evaluation (copper)</b>.</div><div class="modal-bottom"><div class="debrief"><b>About this research:</b> The study examines how family expectations, financial circumstances, and evaluation may influence whether students share uncertainty. The triangle shows three self-reported 0–100 influences in plan and their combined 0–300 score in height. A high score is not a clinical measure of stress. It is an exploratory visualization, not a psychological diagnosis.</div><button type="button" id="btnExplore" class="btn primary">Explore the 3D diagram →</button></div></section></div>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 document.querySelectorAll('.sidenav a').forEach(link=>link.addEventListener('click',()=>{document.querySelectorAll('.sidenav a').forEach(item=>{item.classList.remove('active');item.removeAttribute('aria-current')});link.classList.add('active');link.setAttribute('aria-current','location')}));
-const STORAGE='theseam_saved_own_submission_v8';
+const STORAGE='theseam_saved_own_submission_v10';
 const IS_RESEARCHER=new URLSearchParams(location.search).get('report')==='1';
 const API='/api';
 let liveReady=false, researcherPassword='',poller=null,publicCount=0;
@@ -237,19 +248,21 @@ const QUESTIONS=[
 'How often did keeping a concern private make an academic task harder later?',
 'How often did you discuss an unfinished idea with an instructor or classmate?'];
 const LABELS=['Never','Rarely','Sometimes','Often'];
+ const scoreOK=v=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=100&&Math.abs(v*10-Math.round(v*10))<1e-7;
+ const fmtScore=v=>Number(v).toFixed(1);
 const COLORS=[[55,119,172],[33,155,140],[198,138,83]];
 const VERTS=[{x:0,y:150,z:0},{x:-132,y:-75,z:0},{x:132,y:-75,z:0}];
 let state={records:[],submitted:null}, answers=Array(9).fill(null),consented=false,questionIndex=0,modalOpen=false,activeView='student';
 let storageAvailable=true, studentChart,researchChart,successChart, lastInspected=null;
 let syncChannel=null;
 function getStored(){try{const v=localStorage.getItem(STORAGE);if(v){const obj=JSON.parse(v);if(obj&&validRecord(obj.own)&&obj.submitted===obj.own.id)return{records:[obj.own],submitted:obj.submitted}}}catch(e){storageAvailable=false}return{records:[],submitted:null}}
-function validRecord(r){return r && r.type==='participant' && typeof r.id==='string' && Array.isArray(r.answers) && r.answers.length===9 && r.answers.every(v=>Number.isInteger(v)&&v>=1&&v<=4)&&!isNaN(new Date(r.created_at).getTime())}
+function validRecord(r){return r && r.type==='participant' && r.survey_version==='V10' && typeof r.id==='string' && Array.isArray(r.answers) && r.answers.length===9 && r.answers.every(scoreOK)&&!isNaN(new Date(r.created_at).getTime())}
 function commit(){try{const own=state.records.find(r=>r.id===state.submitted);if(own)localStorage.setItem(STORAGE,JSON.stringify({own,submitted:own.id}));}catch(e){storageAvailable=false}updateAll()}
 function status(t,error=false){$('statusText').textContent=t;$('appStatus').classList.toggle('error',error)}
 function average(index){return state.records.length?(state.records.reduce((s,r)=>s+r.answers[index],0)/state.records.length).toFixed(2):'—'}
 function timestamp(iso){const d=new Date(iso);const fmt=(opts)=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',...opts}).format(d);return `${fmt({month:'short',day:'numeric',year:'numeric'})} · ${fmt({hour:'numeric',minute:'2-digit',second:'2-digit',timeZoneName:'short'})}`}
-function normalize(v){return (v-1)/3}
-function metrics(r){const pts=[0,1,2].map(i=>({x:VERTS[i].x*normalize(r.answers[i]),y:VERTS[i].y*normalize(r.answers[i]),z:0}));const bx=pts.reduce((s,p)=>s+p.x,0)/3,by=pts.reduce((s,p)=>s+p.y,0)/3;const total=r.answers[0]+r.answers[1]+r.answers[2];return{base:{x:bx,y:by,z:0},top:{x:bx,y:by,z:(total-3)/9*205},total,pts}}
+function normalize(v){return v/100}
+function metrics(r){const pts=[0,1,2].map(i=>({x:VERTS[i].x*normalize(r.answers[i]),y:VERTS[i].y*normalize(r.answers[i]),z:0}));const bx=pts.reduce((s,p)=>s+p.x,0)/3,by=pts.reduce((s,p)=>s+p.y,0)/3;const total=r.answers[0]+r.answers[1]+r.answers[2];return{base:{x:bx,y:by,z:0},top:{x:bx,y:by,z:total/300*205},total,pts}}
 function brighten(rgb,a){return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`}
 function mix(cs,weights,alpha=1){const c=[0,1,2].map(k=>Math.round(weights.reduce((s,w,i)=>s+w*cs[i][k],0)));return brighten(c,alpha)}
 function pointBlend(a,b,c,u,v,w){return{x:a.x*u+b.x*v+c.x*w,y:a.y*u+b.y*v+c.y*w,z:a.z*u+b.z*v+c.z*w}}
@@ -278,11 +291,11 @@ class Triangle{
   }
   this.polygon([A,B,C],null,'rgba(111,139,137,.42)',1.5);
   // Four nested gradient contours show the rating increments.
-  for(let t=1;t<=4;t++){const ring=VERTS.map(v=>({x:v.x*(t-1)/3,y:v.y*(t-1)/3,z:0}));if(t>1)this.polygon(ring,null,'rgba(109,133,124,.15)',1);}
-  VERTS.forEach((v,i)=>{this.line({x:0,y:0,z:0},v,brighten(COLORS[i],.81),2);for(let t=1;t<=4;t++){const q={x:v.x*(t-1)/3,y:v.y*(t-1)/3,z:0};this.circle(q,t===4?5:2.7,brighten(COLORS[i],t===4?.99:.73));if(t>1){const m=Math.hypot(v.x,v.y);this.text(String(t),{x:q.x-v.y/m*11,y:q.y+v.x/m*11,z:0},brighten(COLORS[i],.92),-3,10)}}
+  for(let t=1;t<=4;t++){const ring=VERTS.map(v=>({x:v.x*t/4,y:v.y*t/4,z:0}));this.polygon(ring,null,'rgba(109,133,124,.15)',1);}
+  VERTS.forEach((v,i)=>{this.line({x:0,y:0,z:0},v,brighten(COLORS[i],.81),2);for(let t=1;t<=4;t++){const q={x:v.x*t/4,y:v.y*t/4,z:0};this.circle(q,t===4?5:2.7,brighten(COLORS[i],t===4?.99:.73));const m=Math.hypot(v.x,v.y);this.text(String(t*25),{x:q.x-v.y/m*15,y:q.y+v.x/m*15,z:0},brighten(COLORS[i],.92),-3,10)}
    this.text(['FAMILY','FINANCIAL','EVALUATION'][i],{x:v.x*1.22,y:v.y*1.15,z:0},brighten(COLORS[i],.99),i===0?-9:16,this.w<450?11:12)
   });
-  this.text('1',{x:-7,y:9,z:0},'#8a887d',-2,10);
+  this.text('0',{x:-7,y:9,z:0},'#8a887d',-2,10);
   this.line({x:0,y:0,z:0},K,'rgba(179,158,118,.50)',1.2,[4,5]);
   this.text('TOTAL PRESSURE',K,'#9d8357',-8,10);
   // Draw genuine records only; keep highlighted respondent last for visibility.
@@ -293,9 +306,27 @@ class Triangle{
  }
 }
 function controlBar(root,chart){root.innerHTML='';[['3D','3d'],['Plan','plan'],['Section','section'],['+', 'zoomIn'],['−','zoomOut'],['↻','reset'],['Pan','pan'],['Orbit','orbit']].forEach(([label,action])=>{const b=document.createElement('button');b.type='button';b.className='tool';b.textContent=label;b.dataset.action=action;if(action==='3d'||action==='orbit')b.classList.add('active');b.onclick=()=>{if(['3d','plan','section'].includes(action)){chart.setView(action);root.querySelectorAll('button').forEach(x=>{if(['3d','plan','section'].includes(x.dataset.action))x.classList.toggle('active',x===b)})}else if(action==='zoomIn'||action==='zoomOut'){chart.zoom=Math.max(.55,Math.min(2.25,chart.zoom*(action==='zoomIn'?1.16:1/1.16)));chart.draw()}else if(action==='reset'){chart.reset();root.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.action==='3d'||x.dataset.action==='orbit'))}else {chart.tool=action;root.querySelectorAll('button').forEach(x=>{if(['pan','orbit'].includes(x.dataset.action))x.classList.toggle('active',x===b)})}};root.appendChild(b)})}
-function renderQuestion(){const i=questionIndex;$('qProgressText').textContent=`Question ${i+1} of 9`;$('qPercent').textContent=`${Math.round((i+1)/9*100)}%`;$('qBar').style.width=`${(i+1)/9*100}%`;$('qNumber').textContent=`QUESTION ${String(i+1).padStart(2,'0')}`;$('qText').textContent=QUESTIONS[i];$('btnBack').textContent=i===0?'← Participation info':'← Back';$('btnNext').textContent=i===8?'Submit and lock my responses ✓':'Next question →';$('qError').hidden=true;
- const wrap=$('options');wrap.replaceChildren();LABELS.forEach((label,idx)=>{const control=document.createElement('label');control.className='answer';const radio=document.createElement('input');radio.type='radio';radio.name='choice';radio.value=String(idx+1);radio.checked=answers[i]===idx+1;const num=document.createElement('span');num.className='num';num.textContent=String(idx+1);const text=document.createElement('span');text.textContent=label;control.append(radio,num,text);wrap.appendChild(control)});
- window.scrollTo({top:0,behavior:'auto'});
+function renderQuestion(){
+ const i=questionIndex;
+ $('qProgressText').textContent=`Question ${i+1} of 9`;$('qPercent').textContent=`${Math.round((i+1)/9*100)}%`;$('qBar').style.width=`${(i+1)/9*100}%`;
+ $('qNumber').textContent=`QUESTION ${String(i+1).padStart(2,'0')}`;$('qText').textContent=QUESTIONS[i];
+ $('btnBack').textContent=i===0?'← Participation info':'← Back';$('btnNext').textContent=i===8?'Submit and lock my responses ✓':'Next question →';$('qError').hidden=true;
+ const wrap=$('options');wrap.replaceChildren();
+ const top=document.createElement('div');top.className='slider-top';
+ const meta=document.createElement('div');meta.className='slider-kicker';meta.textContent='Frequency · 0 to 100';
+ const readout=document.createElement('div');readout.className='slider-readout';readout.setAttribute('aria-live','polite');top.append(meta,readout);
+ const slider=document.createElement('input');slider.className='slider-input';slider.id='qSlider';slider.type='range';slider.min='0';slider.max='100';slider.step='0.1';slider.value=answers[i]??50;slider.setAttribute('aria-label','Frequency rating from zero, Never, to one hundred, Often');
+ const ends=document.createElement('div');ends.className='slider-labels';ends.innerHTML='<span>0 · Never</span><span>100 · Often</span>';
+ const ticks=document.createElement('div');ticks.className='slider-scale';ticks.innerHTML='<span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>';
+ const adjust=document.createElement('label');adjust.className='slider-adjust';adjust.htmlFor='qNumeric';adjust.textContent='Enter a precise value (optional)';
+ const numeric=document.createElement('input');numeric.id='qNumeric';numeric.className='slider-number';numeric.type='number';numeric.min='0';numeric.max='100';numeric.step='0.1';numeric.placeholder='0.0–100.0';numeric.value=answers[i]===null?'':fmtScore(answers[i]);numeric.setAttribute('aria-label','Precise frequency rating');adjust.appendChild(numeric);
+ const hint=document.createElement('div');hint.className='slider-hint';hint.textContent='Use the slider or enter a number to one decimal place. Your choice is not recorded until you submit the survey.';
+ const show=()=>{readout.textContent=answers[i]===null?'— / 100':fmtScore(answers[i])+' / 100'};
+ const setValue=value=>{const n=Number(value);if(!scoreOK(n)){numeric.setCustomValidity('Enter a value from 0 to 100 in 0.1 increments.');return false}numeric.setCustomValidity('');answers[i]=Math.round(n*10)/10;slider.value=answers[i];numeric.value=fmtScore(answers[i]);$('qError').hidden=true;show();return true};
+ slider.addEventListener('input',()=>setValue(slider.value));
+ numeric.addEventListener('change',()=>{if(numeric.value.trim()!=='')setValue(numeric.value);else{answers[i]=null;show()}});
+ numeric.addEventListener('input',()=>{numeric.setCustomValidity('');if(numeric.value.trim()===''){answers[i]=null;show();return}const n=Number(numeric.value);if(scoreOK(n))setValue(n)});
+ wrap.append(top,slider,ends,ticks,adjust,hint);show();window.scrollTo({top:0,behavior:'auto'});
 }
 function updateStep(step){['stepConsent','stepQuestions','stepComplete'].forEach((id,i)=>{$(id).classList.toggle('active',i===step);$(id).classList.toggle('done',i<step)});$('formKicker').textContent=['Study participation','Participant questionnaire','Submission completed'][step]}
 function showQuestion(){updateStep(1);$('consentPane').hidden=true;$('questionPane').hidden=false;renderQuestion()}
@@ -306,7 +337,7 @@ async function submit(){
  if(!liveReady){status('Shared database is not connected. No response was saved. Please contact the researcher.',true);$('qError').hidden=false;$('qError').textContent='The live database is not connected. Please do not submit yet.';return;}
  if(!deviceToken){status('Anonymous browser token is missing. Allow site storage and reload.',true);return;}
  const payload={answers:answers.slice(),consent:consented,device_token:deviceToken};
- if(!payload.answers.every(x=>Number.isInteger(x)&&x>=1&&x<=4))return;
+ if(!payload.answers.every(scoreOK))return;
  saving=true;
  $('btnNext').disabled=true;$('btnNext').textContent='Saving securely…';
  $('qError').hidden=true;
@@ -337,7 +368,7 @@ async function fetchPublicMap(){
   publicCount=data.count;
   const own=state.records.find(r=>r.id===state.submitted);
   const anon=(data.points||[]).filter(p=>Array.isArray(p.answers)&&p.answers.length===3)
-    .map((p,i)=>({type:'participant',id:'group-'+i,answers:[...p.answers,1,1,1,1,1,1],created_at:null}));
+    .map((p,i)=>({type:'participant',survey_version:'V10',id:'group-'+i,answers:[...p.answers,0,0,0,0,0,0],created_at:null}));
   if(!IS_RESEARCHER){state.records=[...anon,...(own?[own]:[])];updateAll();}
   if($('resultExplanation')&&state.submitted){$('resultExplanation').textContent=data.count<5?
    `Your red dot is saved. ${data.count} of 5 minimum responses received; the collective dots will appear when five participants have submitted.`:
@@ -360,7 +391,7 @@ async function checkLive(){
  catch(e){liveReady=false;status('Shared storage offline: website is not yet fully deployed. Survey submissions are disabled.',true);$('btnStart').disabled=true;return false}
 }
 function getDeviceToken(){
- try{let t=localStorage.getItem('theseam_anonymous_device_v2');if(!t){const bytes=new Uint8Array(24);crypto.getRandomValues(bytes);t=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem('theseam_anonymous_device_v2',t)}return t}
+ try{let t=localStorage.getItem('theseam_anonymous_device_v10');if(!t){const bytes=new Uint8Array(24);crypto.getRandomValues(bytes);t=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem('theseam_anonymous_device_v10',t)}return t}
  catch{return ''}
 }
 function startPolling(){if(poller)clearInterval(poller);poller=setInterval(()=>{if(document.visibilityState==='visible'){if(IS_RESEARCHER&&researcherPassword)fetchAdmin().catch(e=>status(e.message,true));else if(state.submitted)fetchPublicMap()}},3000)}
@@ -369,7 +400,7 @@ function showResult(){const record=state.records.find(r=>r.id===state.submitted)
 function showStudent(){activeView='student';$('studentScreen').hidden=false;$('researchScreen').hidden=true;$('tabStudent').classList.add('active');$('tabResearch').classList.remove('active');if(state.submitted)showResult();else{$('surveyArea').hidden=false;$('studentResult').hidden=true}setTimeout(()=>studentChart?.size(),40)}
 function showResearch(){if(!IS_RESEARCHER)return;activeView='research';$('studentScreen').hidden=true;$('researchScreen').hidden=false;$('tabStudent').classList.remove('active');$('tabResearch').classList.add('active');initCharts();updateAll();setTimeout(()=>researchChart?.size(),55)}
 function initCharts(){if(!studentChart){studentChart=new Triangle($('resultCanvas'));controlBar($('resultTools'),studentChart)}if(!researchChart){researchChart=new Triangle($('researchCanvas'),{researcher:true});controlBar($('researchTools'),researchChart)}if(!successChart){successChart=new Triangle($('successCanvas'))}studentChart.selection=state.submitted;successChart.selection=state.submitted;}
-function inspectValues(r){$('inspectHead').textContent='Participant '+r.id;$('inspectId').textContent=r.id;$('inspectEmpty').hidden=true;$('inspectDetails').hidden=false;$('inspectTime').textContent=timestamp(r.created_at);$('inspectFamily').textContent=`${r.answers[0]} / 4`;$('inspectFinancial').textContent=`${r.answers[1]} / 4`;$('inspectAcademic').textContent=`${r.answers[2]} / 4`;$('inspectTotal').textContent=`${metrics(r).total} / 12`;const m=metrics(r);const overlapping=state.records.filter(p=>{const mp=metrics(p);return Math.abs(mp.top.x-m.top.x)<.001&&Math.abs(mp.top.y-m.top.y)<.001&&Math.abs(mp.top.z-m.top.z)<.001});$('inspectOverlapsWrap').hidden=overlapping.length<2;$('inspectOverlaps').textContent=overlapping.length>1?`${overlapping.length} participants share these coordinates. Choose an ID to inspect each record.`:'';const picker=$('overlapPicker');picker.hidden=overlapping.length<2;picker.replaceChildren();if(overlapping.length>1){overlapping.forEach(p=>{const option=document.createElement('option');option.value=p.id;option.textContent=`ID ${p.id}`;picker.appendChild(option)});picker.value=r.id}}
+function inspectValues(r){$('inspectHead').textContent='Participant '+r.id;$('inspectId').textContent=r.id;$('inspectEmpty').hidden=true;$('inspectDetails').hidden=false;$('inspectTime').textContent=timestamp(r.created_at);$('inspectFamily').textContent=`${fmtScore(r.answers[0])} / 100`;$('inspectFinancial').textContent=`${fmtScore(r.answers[1])} / 100`;$('inspectAcademic').textContent=`${fmtScore(r.answers[2])} / 100`;$('inspectTotal').textContent=`${metrics(r).total.toFixed(1)} / 300`;const m=metrics(r);const overlapping=state.records.filter(p=>{const mp=metrics(p);return Math.abs(mp.top.x-m.top.x)<.001&&Math.abs(mp.top.y-m.top.y)<.001&&Math.abs(mp.top.z-m.top.z)<.001});$('inspectOverlapsWrap').hidden=overlapping.length<2;$('inspectOverlaps').textContent=overlapping.length>1?`${overlapping.length} participants share these coordinates. Choose an ID to inspect each record.`:'';const picker=$('overlapPicker');picker.hidden=overlapping.length<2;picker.replaceChildren();if(overlapping.length>1){overlapping.forEach(p=>{const option=document.createElement('option');option.value=p.id;option.textContent=`ID ${p.id}`;picker.appendChild(option)});picker.value=r.id}}
 function showInspection(r){inspectValues(r)}
 function clearInspection(){$('inspectHead').textContent='Select a point';$('inspectEmpty').hidden=false;$('inspectDetails').hidden=true}
 function updateAll(){const n=state.records.length;$('statCount').textContent=n;$('statFamily').textContent=average(0);$('statFinancial').textContent=average(1);$('statAcademic').textContent=average(2);$('statTotal').textContent=n?(state.records.reduce((s,r)=>s+metrics(r).total,0)/n).toFixed(2):'—';$('researchUpdated').textContent=n?`Last submission: ${timestamp(state.records[n-1].created_at)}`:'No submissions yet';if(researchChart)researchChart.draw();if(studentChart)studentChart.draw();if(successChart)successChart.draw()}
@@ -386,14 +417,14 @@ function renderFindings(summary,rows){
  if(!summary)return;
  const pct=n=>n==null?'—':`${n.toFixed(1)}%`;
  const val=n=>n==null?'—':Number(n).toFixed(2);
- const k=[['Completed responses',String(summary.count)],['Mean total pressure',`${val(summary.pressure.mean)} / 12`],['Median total pressure',val(summary.pressure.median)],['Mean concealment Q4–Q6',`${val(summary.concealment_mean)} / 4`]];
+ const k=[['Completed responses',String(summary.count)],['Mean total pressure',`${val(summary.pressure.mean)} / 300`],['Median total pressure',val(summary.pressure.median)],['Mean concealment Q4–Q6',`${val(summary.concealment_mean)} / 100`]];
  $('findingKpis').innerHTML=k.map(([label,v])=>`<div class="finding-kpi"><small>${label}</small><strong>${v}</strong></div>`).join('');
  let narrative='';
  if(!summary.count)narrative='No responses have been submitted. The 3D pyramid, the question distributions, and the Excel workbook will populate from real participants as soon as their submissions are confirmed.';
  else {
-  narrative=`<strong>${summary.count}</strong> anonymous participant${summary.count===1?' has':'s have'} submitted. The average total reported pressure is <strong>${val(summary.pressure.mean)} of 12</strong> (median ${val(summary.pressure.median)}). `;
+  narrative=`<strong>${summary.count}</strong> anonymous participant${summary.count===1?' has':'s have'} submitted. The average total reported pressure is <strong>${val(summary.pressure.mean)} of 300</strong> (median ${val(summary.pressure.median)}). `;
   narrative+=summary.highest_mean_pressure?.includes('(tied)')?`The three plotted dimensions show a shared highest mean: <strong>${summary.highest_mean_pressure}</strong>. `:`Among the three plotted dimensions, <strong>${summary.highest_mean_pressure}</strong> currently has the highest mean rating. `;
-  narrative+=`The mean response across Q4–Q6, which describe not asking questions, presenting a decision as settled, or postponing feedback, is <strong>${val(summary.concealment_mean)} of 4</strong>. `;
+  narrative+=`The mean response across Q4–Q6, which describe not asking questions, presenting a decision as settled, or postponing feedback, is <strong>${val(summary.concealment_mean)} of 100</strong>. `;
   if(summary.relationship!==null)narrative+=`The descriptive Pearson correlation between total pressure and the Q4–Q6 mean is <strong>${val(summary.relationship)}</strong>. This is an association, not evidence of cause and effect. `;
   else narrative+='A pressure/concealment correlation is withheld until at least five submissions with meaningful variation are available. ';
   if(summary.count<20)narrative+='This is an early sample; avoid drawing general conclusions from it.';
@@ -402,7 +433,7 @@ function renderFindings(summary,rows){
  const dist=$('distributionTable').querySelector('tbody');dist.replaceChildren();
  (summary.dimensions||[]).forEach(d=>{const tr=document.createElement('tr');[`${d.question} · ${d.name}`,val(d.mean),...d.counts,pct(d.frequent_pct)].forEach(item=>{const td=document.createElement('td');td.textContent=item;tr.appendChild(td)});dist.appendChild(tr)});
  const tbody=$('responsesTable').querySelector('tbody');tbody.replaceChildren();
- rows.forEach(r=>{const tr=document.createElement('tr'),a=r.answers;const vals=[r.id,timestamp(r.created_at),a[0],a[1],a[2],a[0]+a[1]+a[2],((a[3]+a[4]+a[5])/3).toFixed(2)];vals.forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});tr.tabIndex=0;tr.setAttribute('role','button');tr.setAttribute('aria-label','Inspect participant '+r.id);const inspectRow=()=>{showInspection(r);$('researchCanvas').scrollIntoView({behavior:'smooth',block:'center'})};tr.addEventListener('click',inspectRow);tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inspectRow()}});tbody.appendChild(tr)});
+ rows.forEach(r=>{const tr=document.createElement('tr'),a=r.answers;const vals=[r.id,timestamp(r.created_at),fmtScore(a[0]),fmtScore(a[1]),fmtScore(a[2]),(a[0]+a[1]+a[2]).toFixed(1),((a[3]+a[4]+a[5])/3).toFixed(2)];vals.forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});tr.tabIndex=0;tr.setAttribute('role','button');tr.setAttribute('aria-label','Inspect participant '+r.id);const inspectRow=()=>{showInspection(r);$('researchCanvas').scrollIntoView({behavior:'smooth',block:'center'})};tr.addEventListener('click',inspectRow);tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inspectRow()}});tbody.appendChild(tr)});
  $('reportGenerated').textContent=`Updated ${new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date())}`;
 }
 async function downloadPrivate(endpoint,filename){
@@ -416,8 +447,8 @@ function externalSync(){}
 $('tabStudent').onclick=showStudent;$('tabResearch').onclick=showResearch;
 $('btnStart').onclick=()=>{if(!$('consentCheck').checked){$('consentError').hidden=false;$('consentCheck').focus();return}$('consentError').hidden=true;consented=true;questionIndex=0;showQuestion()};
 $('btnBack').onclick=()=>{if(questionIndex===0){updateStep(0);$('questionPane').hidden=true;$('consentPane').hidden=false}else{questionIndex--;renderQuestion()}};
-$('btnNext').onclick=()=>{const checked=document.querySelector('input[name="choice"]:checked');if(!checked){$('qError').hidden=false;return}answers[questionIndex]=Number(checked.value);if(questionIndex===8){if(!consented){alert('Consent was not recorded. Please return to the beginning.');return}submit()}else{questionIndex++;renderQuestion()}};
-$('options').addEventListener('change',()=>{$('qError').hidden=true});
+$('btnNext').onclick=()=>{if(!scoreOK(answers[questionIndex])){$('qError').hidden=false;return}if(questionIndex===8){if(!consented){alert('Consent was not recorded. Please return to the beginning.');return}submit()}else{questionIndex++;renderQuestion()}};
+// Sliders and numeric fields manage their own changes.
 $('btnExplore').onclick=()=>{$('successBackdrop').hidden=true;modalOpen=false;setTimeout(()=>studentChart?.size(),70)};
 $('btnExport').onclick=()=>downloadPrivate('export','THE_SEAM_responses.csv').catch(e=>status(e.message,true));$('btnExcel').onclick=()=>downloadPrivate('workbook','THE_SEAM_research_report.xlsx').catch(e=>status(e.message,true));$('btnPrint').onclick=()=>window.print();$('btnReset').onclick=resetStudy;$('overlapPicker').addEventListener('change',e=>{const item=state.records.find(r=>r.id===e.target.value);if(item)showInspection(item)});
 state=getStored();
@@ -427,7 +458,7 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape'&&modalOpen){$('btnExpl
 $('tabResearch').hidden=!IS_RESEARCHER;
 $('tabStudent').hidden=IS_RESEARCHER;
 $('btnReset').textContent='Refresh report now';
-$('consentNotice').innerHTML='<b>Purpose:</b> This questionnaire asks about academic decisions and experiences, including uncertainty, feedback, and expectations. Participation is voluntary, for students aged 18 or older. You may leave before submitting.<br><br><b>Privacy:</b> Nine numerical answers and a server-recorded timestamp are stored online. No names, emails, or student IDs are requested. The website host may log technical access details. The researcher can see individual anonymous scores and times; students only see score-based points after a minimum group size is reached.<br><br><b>Research status:</b> This is a pilot system. Formal recruitment requires the relevant university review and approved consent wording. Submissions cannot be individually withdrawn without an identifying link.';
+$('consentNotice').innerHTML='<b>Purpose:</b> This questionnaire asks about academic decisions and experiences, including uncertainty, feedback, and expectations. Participation is voluntary, for students aged 18 or older. You may leave before submitting.<br><br><b>Privacy:</b> Nine numerical 0–100 slider responses (0.1 increments) and a server-recorded timestamp are stored online. No names, emails, or student IDs are requested. The website host may log technical access details. The researcher can see individual anonymous scores and times; students only see score-based points after a minimum group size is reached.<br><br><b>Research status:</b> This is a pilot system. Formal recruitment requires the relevant university review and approved consent wording. Submissions cannot be individually withdrawn without an identifying link.';
 $('dashboardFootnote').textContent='Server-recorded submission times shown in Eastern Time (EST/EDT). The shared dataset refreshes every three seconds. No fabricated records are loaded.';
 $('modalTip').innerHTML='● &nbsp; Your red marker is locked. Other anonymous participants appear after the group has at least five submissions.';
 $('btnStart').disabled=true;
