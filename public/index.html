@@ -325,7 +325,7 @@ function renderQuestion(){
  const setValue=value=>{const n=Number(value);if(!scoreOK(n)){numeric.setCustomValidity('Enter a value from 0 to 100 in 0.1 increments.');return false}numeric.setCustomValidity('');answers[i]=Math.round(n*10)/10;slider.value=answers[i];numeric.value=fmtScore(answers[i]);$('qError').hidden=true;show();return true};
  slider.addEventListener('input',()=>setValue(slider.value));
  numeric.addEventListener('change',()=>{if(numeric.value.trim()!=='')setValue(numeric.value);else{answers[i]=null;show()}});
- numeric.addEventListener('input',()=>{numeric.setCustomValidity('');if(numeric.value.trim()===''){answers[i]=null;show();return}const n=Number(numeric.value);if(scoreOK(n))setValue(n)});
+ numeric.addEventListener('input',()=>{numeric.setCustomValidity('');if(numeric.value.trim()===''){answers[i]=null;show();return}const n=Number(numeric.value);if(scoreOK(n)){answers[i]=Math.round(n*10)/10;slider.value=answers[i];$('qError').hidden=true;show()}else{answers[i]=null;show()}});
  wrap.append(top,slider,ends,ticks,adjust,hint);show();window.scrollTo({top:0,behavior:'auto'});
 }
 function updateStep(step){['stepConsent','stepQuestions','stepComplete'].forEach((id,i)=>{$(id).classList.toggle('active',i===step);$(id).classList.toggle('done',i<step)});$('formKicker').textContent=['Study participation','Participant questionnaire','Submission completed'][step]}
