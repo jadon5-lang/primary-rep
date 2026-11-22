@@ -101,7 +101,7 @@ test('one decimal place allowed, invalid values rejected', async () => {
  const invalid=[[0,0,0,0,0,0,0,0,100.01],[0,0,0,0,0,0,0,0,101],[0,0,0,0,0,0,0,0,-0.1],[0,0,0,0,0,0,0,0,1.234],[0,0,0,0,0,0,0,0,'30']];
  for(let i=0;i<invalid.length;i++){
    const res=await handleSeamRequest(req('submit','POST',{consent:true,answers:invalid[i],device_token:token(401+i)}),()=>fresh,{password:secret});
-   assert.equal(res.status,400);
+   assert.equal(res.status,400,'Invalid score input '+JSON.stringify(invalid[i])+' received status '+res.status);
  }
  assert.equal((await fresh.list({prefix:'entry/'})).blobs.length,0);
  const ok=await handleSeamRequest(req('submit','POST',{consent:true,answers:[0,0.1,25,50.5,75,99.9,100,0,100],device_token:token(450)}),()=>fresh,{password:secret});
