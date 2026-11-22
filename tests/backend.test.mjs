@@ -238,3 +238,74 @@ test('V10.2 architectural slider shows a 50 preview with gold-left ghost-right t
  assert.doesNotMatch(html,/ticks\.innerHTML/);
  assert.match(html,/id="studentResult"[^>]*hidden/);
 });
+
+test('release compatibility: V9 researcher interface controls and structure are preserved', async () => {
+ const {readFile}=await import('node:fs/promises');
+ const html=await readFile(new URL('../public/index.html',import.meta.url),'utf8');
+ const from=html.indexOf('<div id="researchScreen"');
+ const to=html.indexOf('<div id="successBackdrop"',from);
+ assert.ok(from>=0&&to>from);
+ const page=html.slice(from,to);
+ for(const id of ['researchScreen','researcherLogin','researcherAuthForm','researcherPassword','researchCanvas','researchTools','researchOverview','researchUpdated','statCount','statFamily','statFinancial','statAcademic','statTotal','inspectHead','dashboardFootnote','distributionTable','responsesTable','btnExport','btnExcel','btnPrint','btnReset']){
+  assert.match(page,new RegExp('id="'+id+'"'),id+' researcher element missing');
+ }
+ assert.match(page,/Unlock the findings report/);
+ assert.match(page,/Research findings and analysis/);
+ assert.match(page,/3D triangular pressure diagram/);
+ assert.match(page,/Question-by-question distribution/);
+ assert.match(page,/Participant dataset/);
+ assert.doesNotMatch(page,/id="btnRemoveSelected"/,'No new visible researcher controls should be added');
+ const distribution=page.match(/<table class="report-table" id="distributionTable">([\s\S]*?)<\/table>/)?.[1];
+ assert.ok(distribution);
+ assert.equal((distribution.match(/<th>/g)||[]).length,7,'Preserve original seven-column research distribution layout');
+ assert.match(html,/new URLSearchParams\(location.search\).get\('report'\)==='1'/,'Keep existing researcher URL mechanism');
+ assert.match(html,/\$\('tabResearch'\)\.hidden=!IS_RESEARCHER/);
+ assert.match(html,/fetch\(API+'\/research'/,'Research endpoint wiring must remain intact');
+ assert.match(html,/fetch\(API+'\/export'/);
+ assert.match(html,/downloadPrivate\('workbook'/);
+});
+test('release integration: participant submissions remain linked to the private research page and exports', async () => {
+ const fresh=new MemoryStore();
+ const tk=token(990);
+ const response=[62.5,81,43.7,20.5,44,89.9,11.1,78.5,90];
+ const submitted=await handleSeamRequest(req('submit','POST',{consent:true,answers:response,device_token:tk}),()=>fresh,{password:secret});
+ assert.equal(submitted.status,201);
+ const record=(await submitted.json()).record;
+ assert.equal(record.survey_version,'V10.2');
+ assert.deepEqual(record.answers,response);
+ assert.ok(/^\d{3}$/.test(record.id));
+ assert.match(record.created_at,/^\d{4}-\d{2}-\d{2}T/);
+ const unauthorized=await handleSeamRequest(req('research'),()=>fresh,{password:secret});
+ assert.equal(unauthorized.status,401);
+ const report=await handleSeamRequest(req('research','GET',null,{authorization:'Bearer '+secret}),()=>fresh,{password:secret});
+ assert.equal(report.status,200);
+ const data=await report.json();
+ assert.equal(data.summary.count,1);
+ assert.equal(data.summary.plotted_count,1);
+ assert.equal(data.records[0].id,record.id);
+ assert.equal(data.records[0].answers[1],81);
+ assert.ok(data.records[0].coords);
+ assert.equal(data.summary.dimensions[3].mean,20.5);
+ const map=await handleSeamRequest(req('map','GET',null,{'x-seam-token':tk}),()=>fresh,{password:secret});
+ assert.equal(map.status,200);
+ assert.equal((await map.json()).count,1);
+ const csv=await handleSeamRequest(req('export','GET',null,{authorization:'Bearer '+secret}),()=>fresh,{password:secret});
+ assert.equal(csv.status,200);
+ const csvData=await csv.text();
+ assert.match(csvData,/62\.5/);
+ assert.match(csvData,/81/);
+ assert.match(csvData,/V10\.2/);
+ const workbook=await handleSeamRequest(req('workbook','GET',null,{authorization:'Bearer '+secret}),()=>fresh,{password:secret});
+ assert.equal(workbook.status,200);
+ assert.match(workbook.headers.get('content-type'),/spreadsheetml/);
+});
+test('release safety: new V10.2 submissions cannot touch the original V9 production blob namespace', async () => {
+ const {readFile}=await import('node:fs/promises');
+ const body=await readFile(new URL('../netlify/functions/api.mjs',import.meta.url),'utf8');
+ assert.match(body,/getStore\(\{ name: 'the-seam-verified-responses-v10-2'/);
+ assert.match(body,/getDeployStore\(\{ name: 'the-seam-verified-responses-v10-2-preview'/);
+ assert.doesNotMatch(body,/getStore\(\{ name: 'the-seam-verified-responses-v8'/);
+ const {storageScopeFor}=await import('../lib/deploy-safety.mjs');
+ assert.equal(storageScopeFor({deploy:{context:'production'}}),'site-wide-production');
+ assert.equal(storageScopeFor({deploy:{context:'branch-deploy'}}),'deploy-specific-preview');
+});
