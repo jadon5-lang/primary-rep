@@ -64,7 +64,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #559d91;outline-offse
 .progress{height:5px;background:#e9e2d5;border-radius:9px;overflow:hidden;margin:7px 0 26px}
 .progress > div{height:100%;width:0;background:linear-gradient(90deg,#b58e54,#d6b779);transition:width .18s}
 .q-index{color:#998055;letter-spacing:.15em;font-weight:800;font-size:10px;margin-bottom:16px}
-.question-text{font:normal clamp(23px,2.9vw,32px)/1.26 Georgia,serif;max-width:660px;margin:0 0 10px}
+.question-text{font:600 clamp(23px,2.9vw,32px)/1.26 Georgia,serif;max-width:660px;margin:0 0 10px;color:#143d33;letter-spacing:-.012em}
 .period{font-size:12px;color:#79847e;margin-bottom:25px}
 .answers{display:grid;gap:10px;margin:17px 0 28px}
 .answer{display:flex;align-items:center;min-height:58px;gap:16px;border:1px solid #ddd7cd;background:#fffdfa;border-radius:10px;padding:11px 15px;cursor:pointer;transition:background .18s,border-color .18s,box-shadow .18s}
@@ -75,11 +75,21 @@ button:focus-visible,input:focus-visible{outline:3px solid #559d91;outline-offse
 .slider-card{background:#fffcf7;border:1px solid #e0d5c2;border-radius:16px;padding:23px 22px 19px;margin:20px 0 28px}
 .slider-top{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
 .slider-kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8c784f;font-weight:800}
-.slider-readout{font:normal 42px/1.1 Georgia,serif;color:var(--dark);font-variant-numeric:tabular-nums}
-.slider-input{width:100%;margin:27px 0 14px;height:11px;accent-color:#ad8952;cursor:pointer;touch-action:pan-y}
+.slider-gesture{font-size:10px;text-transform:uppercase;letter-spacing:.13em;font-weight:750;color:#a09b91}
+.slider-rail{position:relative;margin:17px 0 13px;padding-top:56px;min-height:106px}
+.slider-float{position:absolute;top:0;left:50%;transform:translateX(-50%);background:linear-gradient(155deg,#b89a6b,#a98048);color:#fffdf7;border:1px solid #9b7544;border-radius:11px;min-width:72px;min-height:44px;padding:8px 13px;text-align:center;pointer-events:none;box-shadow:0 6px 12px #7556322c;transition:background .17s,border .17s,color .17s}
+.slider-float:after{content:'';position:absolute;left:calc(50% - 6px);bottom:-7px;width:12px;height:12px;transform:rotate(45deg);background:#a9844e;border-right:1px solid #9b7544;border-bottom:1px solid #9b7544}
+.slider-float.preview{background:#f3ecdf;color:#83765f;border:1px dashed #c9bca5;box-shadow:none}
+.slider-float.preview:after{background:#f3ecdf;border-color:#c9bca5}
+.slider-readout{display:block;position:relative;z-index:1;font:600 21px/1.15 Georgia,serif;font-variant-numeric:tabular-nums}
+.slider-input{display:block;width:100%;height:12px;margin:0;box-sizing:border-box;-webkit-appearance:none;appearance:none;border:0;border-radius:999px;background:linear-gradient(90deg,#b28b52 0%,#b28b52 var(--fill,50%),rgba(176,172,161,.23) var(--fill,50%),rgba(176,172,161,.23) 100%);box-shadow:inset 0 1px 3px #4a4a3b20;cursor:ew-resize;touch-action:pan-y}
+.slider-input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:31px;height:38px;border:3px solid #fffdf8;border-radius:10px;background:linear-gradient(140deg,#d2b077,#a77e47);box-shadow:0 3px 8px #76542f61,0 0 0 1px #9a7546;cursor:grab}
+.slider-input::-moz-range-thumb{width:25px;height:32px;border:3px solid #fffdf8;border-radius:10px;background:linear-gradient(140deg,#d2b077,#a77e47);box-shadow:0 3px 8px #76542f61,0 0 0 1px #9a7546;cursor:grab}
+.slider-input:active::-webkit-slider-thumb{cursor:grabbing;box-shadow:0 4px 12px #76542f80,0 0 0 2px #9a7546}
+.slider-input:active::-moz-range-thumb{cursor:grabbing;box-shadow:0 4px 12px #76542f80,0 0 0 2px #9a7546}
 .slider-labels{display:flex;justify-content:space-between;gap:14px;font-size:12px;color:#68766f;font-weight:700}
-.slider-scale{display:flex;justify-content:space-between;color:#969287;font-size:10px;margin-top:7px}
-.slider-adjust{display:flex;align-items:center;gap:10px;margin-top:24px;flex-wrap:wrap;font-size:12px;color:#5b6963}
+.slider-labels span:last-child{text-align:right}
+.slider-adjust{display:flex;align-items:center;gap:10px;margin-top:22px;flex-wrap:wrap;font-size:12px;color:#5b6963}
 .slider-number{width:115px;max-width:100%;font-size:16px;padding:9px 12px;border:1px solid #cfc5b6;border-radius:8px;font-variant-numeric:tabular-nums}
 .slider-hint{margin-top:12px;font-size:11px;color:#778079}
 .slider-input:focus-visible,.slider-number:focus-visible{outline:3px solid #c8a46d;outline-offset:3px}
@@ -317,19 +327,47 @@ function renderQuestion(){
  const wrap=$('options');wrap.replaceChildren();
  const top=document.createElement('div');top.className='slider-top';
  const meta=document.createElement('div');meta.className='slider-kicker';meta.textContent=scale.kind+' · 0–100';
- const readout=document.createElement('div');readout.className='slider-readout';readout.setAttribute('aria-live','polite');top.append(meta,readout);
- const slider=document.createElement('input');slider.className='slider-input';slider.id='qSlider';slider.type='range';slider.min='0';slider.max='100';slider.step='0.1';slider.value=answers[i]??50;slider.setAttribute('aria-label',scale.kind+' rating. 0: '+scale.low+'. 100: '+scale.high+'.');
- const ends=document.createElement('div');ends.className='slider-labels';ends.replaceChildren();[ '0 · '+scale.low, '100 · '+scale.high ].forEach(value=>{const span=document.createElement('span');span.textContent=value;ends.appendChild(span)});;
- const ticks=document.createElement('div');ticks.className='slider-scale';ticks.innerHTML='<span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>';
+ const cue=document.createElement('span');cue.className='slider-gesture';cue.textContent='DRAG TO SELECT';
+ top.append(meta,cue);
+ const rail=document.createElement('div');rail.className='slider-rail';
+ const float=document.createElement('div');float.className='slider-float';
+ const readout=document.createElement('span');readout.className='slider-readout';readout.setAttribute('aria-live','polite');
+ float.appendChild(readout);
+ const slider=document.createElement('input');slider.className='slider-input';slider.id='qSlider';slider.type='range';slider.min='0';slider.max='100';slider.step='0.1';slider.value=answers[i]??50;
+ slider.setAttribute('aria-label',scale.kind+' rating. 0: '+scale.low+'. 100: '+scale.high+'.');
+ rail.append(float,slider);
+ const ends=document.createElement('div');ends.className='slider-labels';
+ ['0 · '+scale.low,'100 · '+scale.high].forEach(value=>{const span=document.createElement('span');span.textContent=value;ends.appendChild(span)});
  const adjust=document.createElement('label');adjust.className='slider-adjust';adjust.htmlFor='qNumeric';adjust.textContent='Enter a precise value (optional)';
- const numeric=document.createElement('input');numeric.id='qNumeric';numeric.className='slider-number';numeric.type='number';numeric.min='0';numeric.max='100';numeric.step='0.1';numeric.placeholder='0.0–100.0';numeric.value=answers[i]===null?'':fmtScore(answers[i]);numeric.setAttribute('aria-label',scale.kind+' precise rating, 0 to 100');adjust.appendChild(numeric);
- const hint=document.createElement('div');hint.className='slider-hint';hint.textContent=scale.help+' Decimal ratings are welcome; nothing is saved until submission.';
- const show=()=>{readout.textContent=answers[i]===null?'— / 100':fmtScore(answers[i])+' / 100'};
- const setValue=value=>{const n=Number(value);if(!scoreOK(n)){numeric.setCustomValidity('Enter a value from 0 to 100 in 0.1 increments.');return false}numeric.setCustomValidity('');skipped[i]=false;answers[i]=Math.round(n*10)/10;slider.value=answers[i];numeric.value=fmtScore(answers[i]);$('qError').hidden=true;show();return true};
+ const numeric=document.createElement('input');numeric.id='qNumeric';numeric.className='slider-number';numeric.type='number';numeric.min='0';numeric.max='100';numeric.step='0.1';numeric.placeholder='0–100';
+ numeric.value=answers[i]===null?'':fmtScore(answers[i]);numeric.setAttribute('aria-label',scale.kind+' precise rating, 0 to 100');adjust.appendChild(numeric);
+ const hint=document.createElement('div');hint.className='slider-hint';hint.textContent=scale.help+' Move the gold handle to choose a value. Nothing is saved until submission.';
+ const show=()=>{
+   const value=answers[i]===null?50:answers[i];
+   readout.textContent=skipped[i]?'Skipped':answers[i]===null?'50':fmtScore(value);
+   float.classList.toggle('preview',answers[i]===null);
+   slider.value=String(value);slider.style.setProperty('--fill',value+'%');
+   const width=rail.clientWidth;
+   float.style.left=width? (15+(width-30)*value/100)+'px':value+'%';
+   slider.setAttribute('aria-valuetext',answers[i]===null?'No selection yet':fmtScore(value)+' out of 100');
+ };
+ const setValue=value=>{
+   const n=Number(value);
+   if(!scoreOK(n)){numeric.setCustomValidity('Enter a value from 0 to 100, to one decimal place.');return false}
+   numeric.setCustomValidity('');skipped[i]=false;answers[i]=Math.round(n*10)/10;numeric.value=fmtScore(answers[i]);$('qError').hidden=true;show();return true;
+ };
  slider.addEventListener('input',()=>setValue(slider.value));
  numeric.addEventListener('change',()=>{if(numeric.value.trim()!=='')setValue(numeric.value);else{answers[i]=null;skipped[i]=false;show()}});
- numeric.addEventListener('input',()=>{numeric.setCustomValidity('');if(numeric.value.trim()===''){answers[i]=null;skipped[i]=false;show();return}const n=Number(numeric.value);if(scoreOK(n)){skipped[i]=false;answers[i]=Math.round(n*10)/10;slider.value=answers[i];$('qError').hidden=true;show()}else{answers[i]=null;skipped[i]=false;show()}});
- wrap.append(top,slider,ends,ticks,adjust,hint);show();if(skipped[i])readout.textContent='Skipped';window.scrollTo({top:0,behavior:'auto'});
+ numeric.addEventListener('input',()=>{
+   numeric.setCustomValidity('');
+   if(numeric.value.trim()===''){answers[i]=null;skipped[i]=false;show();return}
+   const n=Number(numeric.value);
+   if(scoreOK(n)){skipped[i]=false;answers[i]=Math.round(n*10)/10;$('qError').hidden=true;show()}
+   else{answers[i]=null;skipped[i]=false;show()}
+ });
+ wrap.append(top,rail,ends,adjust,hint);show();
+ if(typeof ResizeObserver!=='undefined')new ResizeObserver(show).observe(rail);
+ window.scrollTo({top:0,behavior:'auto'});
 }
 function updateStep(step){['stepConsent','stepQuestions','stepComplete'].forEach((id,i)=>{$(id).classList.toggle('active',i===step);$(id).classList.toggle('done',i<step)});$('formKicker').textContent=['Study participation','Participant questionnaire','Submission completed'][step]}
 function showQuestion(){updateStep(1);$('consentPane').hidden=true;$('questionPane').hidden=false;renderQuestion()}
