@@ -259,17 +259,20 @@ const QUESTIONS=[
  const fmtScore=v=>Number(v).toFixed(1);
 const COLORS=[[55,119,172],[33,155,140],[198,138,83]];
 const VERTS=[{x:0,y:150,z:0},{x:-132,y:-75,z:0},{x:132,y:-75,z:0}];
-let state={records:[],submitted:null}, answers=Array(9).fill(null),consented=false,questionIndex=0,modalOpen=false,activeView='student';
+let state={records:[],submitted:null}, answers=Array(9).fill(null),skipped=Array(9).fill(false),consented=false,questionIndex=0,modalOpen=false,activeView='student';
 let storageAvailable=true, studentChart,researchChart,successChart, lastInspected=null;
 let syncChannel=null;
 function getStored(){try{const v=localStorage.getItem(STORAGE);if(v){const obj=JSON.parse(v);if(obj&&validRecord(obj.own)&&obj.submitted===obj.own.id)return{records:[obj.own],submitted:obj.submitted}}}catch(e){storageAvailable=false}return{records:[],submitted:null}}
-function validRecord(r){return r && r.type==='participant' && r.survey_version==='V10' && typeof r.id==='string' && Array.isArray(r.answers) && r.answers.length===9 && r.answers.every(scoreOK)&&!isNaN(new Date(r.created_at).getTime())}
+function validRecord(r){return r && r.type==='participant' && r.survey_version==='V10' && typeof r.id==='string' && Array.isArray(r.answers) && r.answers.length===9 && r.answers.every(v=>v===null||scoreOK(v))&&!isNaN(new Date(r.created_at).getTime())}
 function commit(){try{const own=state.records.find(r=>r.id===state.submitted);if(own)localStorage.setItem(STORAGE,JSON.stringify({own,submitted:own.id}));}catch(e){storageAvailable=false}updateAll()}
 function status(t,error=false){$('statusText').textContent=t;$('appStatus').classList.toggle('error',error)}
-function average(index){return state.records.length?(state.records.reduce((s,r)=>s+r.answers[index],0)/state.records.length).toFixed(2):'—'}
+function average(index){const a=state.records.map(r=>r.answers[index]).filter(scoreOK);return a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(2):'—'}
 function timestamp(iso){const d=new Date(iso);const fmt=(opts)=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',...opts}).format(d);return `${fmt({month:'short',day:'numeric',year:'numeric'})} · ${fmt({hour:'numeric',minute:'2-digit',second:'2-digit',timeZoneName:'short'})}`}
 function normalize(v){return v/100}
-function metrics(r){const pts=[0,1,2].map(i=>({x:VERTS[i].x*normalize(r.answers[i]),y:VERTS[i].y*normalize(r.answers[i]),z:0}));const bx=pts.reduce((s,p)=>s+p.x,0)/3,by=pts.reduce((s,p)=>s+p.y,0)/3;const total=r.answers[0]+r.answers[1]+r.answers[2];return{base:{x:bx,y:by,z:0},top:{x:bx,y:by,z:total/300*205},total,pts}}
+function hasPressure(r){return r.answers.slice(0,3).every(scoreOK)}
+function meanAnswered(a){const b=a.filter(scoreOK);return b.length?b.reduce((x,y)=>x+y,0)/b.length:null}
+function fmtMaybe(v){return scoreOK(v)?fmtScore(v):'Skipped'}
+function metrics(r){if(!hasPressure(r))return null;const pts=[0,1,2].map(i=>({x:VERTS[i].x*normalize(r.answers[i]),y:VERTS[i].y*normalize(r.answers[i]),z:0}));const bx=pts.reduce((s,p)=>s+p.x,0)/3,by=pts.reduce((s,p)=>s+p.y,0)/3;const total=r.answers[0]+r.answers[1]+r.answers[2];return{base:{x:bx,y:by,z:0},top:{x:bx,y:by,z:total/300*205},total,pts}}
 function brighten(rgb,a){return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`}
 function mix(cs,weights,alpha=1){const c=[0,1,2].map(k=>Math.round(weights.reduce((s,w,i)=>s+w*cs[i][k],0)));return brighten(c,alpha)}
 function pointBlend(a,b,c,u,v,w){return{x:a.x*u+b.x*v+c.x*w,y:a.y*u+b.y*v+c.y*w,z:a.z*u+b.z*v+c.z*w}}
@@ -308,8 +311,8 @@ class Triangle{
   // Draw genuine records only; keep highlighted respondent last for visibility.
   const submitted=state.records.slice();const me=submitted.find(r=>r.id===this.selection);const others=submitted.filter(r=>r!==me);
   const ordered=me?[...others,me]:others;
-  for(const r of ordered){const m=metrics(r);const special=r===me;const p1=this.project(m.top);this.line(m.base,m.top,special?'rgba(196,74,63,.7)':'rgba(111,120,117,.23)',special?2:1,[3,4]);this.circle(m.base,special?4:2.8,special?'rgba(188,76,67,.40)':'rgba(103,128,126,.17)');const color=special?'#c95045':'#818e8a';const rad=special?8:5.8;this.circle(m.top,rad,color,'#fffdfa');this.hotspots.push({p:p1,record:r,all:submitted,radius:rad})}
-  if(ordered.length===0){const p=this.project({x:0,y:0,z:82});c.save();c.fillStyle='#667e75';c.textAlign='center';c.font='italic 17px Georgia,serif';c.fillText('Waiting for the first response',p.x,p.y);c.font='12px Arial,sans-serif';c.fillText('Only submitted student responses will appear here',p.x,p.y+25);c.restore()}
+  for(const r of ordered){const m=metrics(r);if(!m)continue;const special=r===me;const p1=this.project(m.top);this.line(m.base,m.top,special?'rgba(196,74,63,.7)':'rgba(111,120,117,.23)',special?2:1,[3,4]);this.circle(m.base,special?4:2.8,special?'rgba(188,76,67,.40)':'rgba(103,128,126,.17)');const color=special?'#c95045':'#818e8a';const rad=special?8:5.8;this.circle(m.top,rad,color,'#fffdfa');this.hotspots.push({p:p1,record:r,all:submitted,radius:rad})}
+  if(ordered.every(r=>!metrics(r))){const p=this.project({x:0,y:0,z:82});c.save();c.fillStyle='#667e75';c.textAlign='center';c.font='italic 17px Georgia,serif';c.fillText('Waiting for the first response',p.x,p.y);c.font='12px Arial,sans-serif';c.fillText('Only submitted student responses will appear here',p.x,p.y+25);c.restore()}
  }
 }
 function controlBar(root,chart){root.innerHTML='';[['3D','3d'],['Plan','plan'],['Section','section'],['+', 'zoomIn'],['−','zoomOut'],['↻','reset'],['Pan','pan'],['Orbit','orbit']].forEach(([label,action])=>{const b=document.createElement('button');b.type='button';b.className='tool';b.textContent=label;b.dataset.action=action;if(action==='3d'||action==='orbit')b.classList.add('active');b.onclick=()=>{if(['3d','plan','section'].includes(action)){chart.setView(action);root.querySelectorAll('button').forEach(x=>{if(['3d','plan','section'].includes(x.dataset.action))x.classList.toggle('active',x===b)})}else if(action==='zoomIn'||action==='zoomOut'){chart.zoom=Math.max(.55,Math.min(2.25,chart.zoom*(action==='zoomIn'?1.16:1/1.16)));chart.draw()}else if(action==='reset'){chart.reset();root.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.action==='3d'||x.dataset.action==='orbit'))}else {chart.tool=action;root.querySelectorAll('button').forEach(x=>{if(['pan','orbit'].includes(x.dataset.action))x.classList.toggle('active',x===b)})}};root.appendChild(b)})}
@@ -329,11 +332,11 @@ function renderQuestion(){
  const numeric=document.createElement('input');numeric.id='qNumeric';numeric.className='slider-number';numeric.type='number';numeric.min='0';numeric.max='100';numeric.step='0.1';numeric.placeholder='0.0–100.0';numeric.value=answers[i]===null?'':fmtScore(answers[i]);numeric.setAttribute('aria-label','Precise frequency rating');adjust.appendChild(numeric);
  const hint=document.createElement('div');hint.className='slider-hint';hint.textContent='Use the slider or enter a number to one decimal place. Your choice is not recorded until you submit the survey.';
  const show=()=>{readout.textContent=answers[i]===null?'— / 100':fmtScore(answers[i])+' / 100'};
- const setValue=value=>{const n=Number(value);if(!scoreOK(n)){numeric.setCustomValidity('Enter a value from 0 to 100 in 0.1 increments.');return false}numeric.setCustomValidity('');answers[i]=Math.round(n*10)/10;slider.value=answers[i];numeric.value=fmtScore(answers[i]);$('qError').hidden=true;show();return true};
+ const setValue=value=>{const n=Number(value);if(!scoreOK(n)){numeric.setCustomValidity('Enter a value from 0 to 100 in 0.1 increments.');return false}numeric.setCustomValidity('');skipped[i]=false;answers[i]=Math.round(n*10)/10;slider.value=answers[i];numeric.value=fmtScore(answers[i]);$('qError').hidden=true;show();return true};
  slider.addEventListener('input',()=>setValue(slider.value));
- numeric.addEventListener('change',()=>{if(numeric.value.trim()!=='')setValue(numeric.value);else{answers[i]=null;show()}});
- numeric.addEventListener('input',()=>{numeric.setCustomValidity('');if(numeric.value.trim()===''){answers[i]=null;show();return}const n=Number(numeric.value);if(scoreOK(n)){answers[i]=Math.round(n*10)/10;slider.value=answers[i];$('qError').hidden=true;show()}else{answers[i]=null;show()}});
- wrap.append(top,slider,ends,ticks,adjust,hint);show();window.scrollTo({top:0,behavior:'auto'});
+ numeric.addEventListener('change',()=>{if(numeric.value.trim()!=='')setValue(numeric.value);else{answers[i]=null;skipped[i]=false;show()}});
+ numeric.addEventListener('input',()=>{numeric.setCustomValidity('');if(numeric.value.trim()===''){answers[i]=null;skipped[i]=false;show();return}const n=Number(numeric.value);if(scoreOK(n)){skipped[i]=false;answers[i]=Math.round(n*10)/10;slider.value=answers[i];$('qError').hidden=true;show()}else{answers[i]=null;skipped[i]=false;show()}});
+ wrap.append(top,slider,ends,ticks,adjust,hint);show();if(skipped[i])readout.textContent='Skipped';window.scrollTo({top:0,behavior:'auto'});
 }
 function updateStep(step){['stepConsent','stepQuestions','stepComplete'].forEach((id,i)=>{$(id).classList.toggle('active',i===step);$(id).classList.toggle('done',i<step)});$('formKicker').textContent=['Study participation','Participant questionnaire','Submission completed'][step]}
 function showQuestion(){updateStep(1);$('consentPane').hidden=true;$('questionPane').hidden=false;renderQuestion()}
@@ -344,7 +347,7 @@ async function submit(){
  if(!liveReady){status('Shared database is not connected. No response was saved. Please contact the researcher.',true);$('qError').hidden=false;$('qError').textContent='The live database is not connected. Please do not submit yet.';return;}
  if(!deviceToken){status('Anonymous browser token is missing. Allow site storage and reload.',true);return;}
  const payload={answers:answers.slice(),consent:consented,device_token:deviceToken};
- if(!payload.answers.every(scoreOK))return;
+ if(!payload.answers.every(v=>v===null||scoreOK(v)))return;
  saving=true;
  $('btnNext').disabled=true;$('btnNext').textContent='Saving securely…';
  $('qError').hidden=true;
@@ -454,7 +457,9 @@ function externalSync(){}
 $('tabStudent').onclick=showStudent;$('tabResearch').onclick=showResearch;
 $('btnStart').onclick=()=>{if(!$('consentCheck').checked){$('consentError').hidden=false;$('consentCheck').focus();return}$('consentError').hidden=true;consented=true;questionIndex=0;showQuestion()};
 $('btnBack').onclick=()=>{if(questionIndex===0){updateStep(0);$('questionPane').hidden=true;$('consentPane').hidden=false}else{questionIndex--;renderQuestion()}};
-$('btnNext').onclick=()=>{if(!scoreOK(answers[questionIndex])){$('qError').hidden=false;return}if(questionIndex===8){if(!consented){alert('Consent was not recorded. Please return to the beginning.');return}submit()}else{questionIndex++;renderQuestion()}};
+function advanceSurvey(){if(questionIndex===8){if(!consented){alert('Consent was not recorded. Please return to the beginning.');return}submit()}else{questionIndex++;renderQuestion()}}
+ $('btnNext').onclick=()=>{if(!scoreOK(answers[questionIndex])&&!skipped[questionIndex]){$('qError').hidden=false;return}advanceSurvey()};
+ $('btnSkip').onclick=()=>{answers[questionIndex]=null;skipped[questionIndex]=true;advanceSurvey()};
 // Sliders and numeric fields manage their own changes.
 $('btnExplore').onclick=()=>{$('successBackdrop').hidden=true;modalOpen=false;setTimeout(()=>studentChart?.size(),70)};
 $('btnExport').onclick=()=>downloadPrivate('export','THE_SEAM_responses.csv').catch(e=>status(e.message,true));$('btnExcel').onclick=()=>downloadPrivate('workbook','THE_SEAM_research_report.xlsx').catch(e=>status(e.message,true));$('btnPrint').onclick=()=>window.print();$('btnReset').onclick=resetStudy;$('overlapPicker').addEventListener('change',e=>{const item=state.records.find(r=>r.id===e.target.value);if(item)showInspection(item)});
