@@ -196,12 +196,12 @@ button:focus-visible,input:focus-visible{outline:3px solid #559d91;outline-offse
   <section class="card form-shell"><div class="form-tag upper" id="formKicker">Study participation</div><div id="consentPane"><div class="form-head"><div><h2>Before you begin</h2><p class="muted">Please review the information below.</p></div><span class="pill">About 3 minutes</span></div><div id="consentNotice" class="notice"><b>THE SEAM — Research Participant Information (V10 pilot)</b><br>
 <b>Student researcher:</b> Master of Architecture Candidate [researcher name to confirm]. <b>Faculty supervisor:</b> coleman a. jordan. <b>Questions/contact:</b> [researcher email] or [faculty supervisor email] — complete before recruitment.<br><br>
 <b>Purpose:</b> This thesis research explores how expectations, finances, and academic evaluation relate to students' choices to reveal or withhold uncertainty.<br><br>
-<b>Participation:</b> An anonymous online questionnaire of nine 0–100 slider questions, about 3–5 minutes, referring to the last four weeks of classes. No interview, audio/video recording, or identifiable quotations are collected through this questionnaire. You may skip any question, stop before submitting, or choose not to participate, without penalty.<br><br>
+<b>Participation:</b> An anonymous online questionnaire of nine statements rated from 0 (not at all true of your experience) to 100 (completely true of your experience), about 3–5 minutes, referring to the last four weeks of classes. No interview, audio/video recording, or identifiable quotations are collected through this questionnaire. You may skip any question, stop before submitting, or choose not to participate, without penalty.<br><br>
 <b>Risks:</b> Reflecting on academic pressures and personal expectations may cause mild discomfort. Skip any question or discontinue if you wish. <b>Benefits:</b> There is no compensation or guaranteed personal benefit. Your responses may contribute to understanding how uncertainty is experienced in academic settings.<br><br>
 <b>Privacy:</b> No name, signature, school ID, email, or contact information is requested. If you submit, the system stores your numerical responses (including skipped items), an anonymous three-digit code, and a server-recorded time. A private researcher report shows individual scores and times. Your browser holds a private, randomly generated token used for recovery and withdrawal; the server stores its hash. The website host may retain technical access logs.<br><br>
 <b>Withdrawal:</b> You may delete your submitted answers through the <i>Withdraw my response</i> control on your results page while using the same browser. If that browser is no longer available, contact the researcher with your anonymous three-digit code to request removal. A code alone does not establish identity, so the researcher may need to confirm the request. Questions you skip are not counted as zero, and an incomplete pressure profile cannot be plotted.<br><br>
 <b>Research status:</b> This is a testing version. Final participant information and institutional approvals must be confirmed before formal recruitment.</div><label class="consent"><input id="consentCheck" type="checkbox"><span>I am at least 18 years old, have read the information above, and voluntarily agree to take part in this test survey.</span></label><div id="consentError" class="error-msg" hidden>Please check the participation box to continue.</div><div class="actions"><span class="muted" style="font-size:12px">No identifying information requested.</span><button id="btnStart" class="btn primary" type="button">Begin survey →</button></div></div>
-  <div id="questionPane" hidden><div class="form-head"><div><h2>Student experiences</h2><p class="muted">Move the slider to rate each experience from 0 to 100. You can also type a number.</p></div><span class="pill">Anonymous</span></div><div class="progress-top"><span id="qProgressText">Question 1 of 9</span><span id="qPercent">11%</span></div><div class="progress"><div id="qBar"></div></div><div id="qNumber" class="q-index">QUESTION 01</div><h3 id="qText" class="question-text"></h3><div class="period">During the past four weeks of classes</div><div id="options" class="slider-card" aria-label="Frequency of experience on a 0 to 100 scale"></div><div id="qError" class="error-msg" hidden>Move the slider or type a score to continue.</div><div class="actions"><button id="btnBack" class="btn" type="button">← Back</button><button id="btnSkip" class="btn" type="button">Skip question</button><button id="btnNext" class="btn primary" type="button">Next question →</button></div><p class="readme-line">The diagram remains hidden until after you submit. Skipping is always allowed; a skipped pressure question is not plotted as zero.</p></div></section>
+  <div id="questionPane" hidden><div class="form-head"><div><h2>Student experiences</h2><p class="muted">Think about the past four weeks of classes. Rate how closely each statement reflects your experience, from 0 to 100.</p></div><span class="pill">Anonymous</span></div><div class="progress-top"><span id="qProgressText">Question 1 of 9</span><span id="qPercent">11%</span></div><div class="progress"><div id="qBar"></div></div><div id="qNumber" class="q-index">QUESTION 01</div><h3 id="qText" class="question-text"></h3><div class="period">During the past four weeks of classes</div><div id="options" class="slider-card" aria-label="How closely this statement describes your experience, on a 0 to 100 scale"></div><div id="qError" class="error-msg" hidden>Move the slider or type a score to continue.</div><div class="actions"><button id="btnBack" class="btn" type="button">← Back</button><button id="btnSkip" class="btn" type="button">Skip question</button><button id="btnNext" class="btn primary" type="button">Next question →</button></div><p class="readme-line">The diagram remains hidden until after you submit. Skipping is always allowed; a skipped pressure question is not plotted as zero.</p></div></section>
  </div>
  <div id="studentResult" class="card student-result" hidden><div class="locked-top">✓ Survey completed. Your answers have been recorded and locked.</div><div class="upper form-tag">Your spatial position · <span id="resultParticipantId">ANONYMOUS ID —</span></div><h2>You are now part of the diagram.</h2><p class="muted" id="resultExplanation">Your response appears as the red marker. Other anonymous participants appear in gray once at least five people have submitted. Rotate, pan, or zoom to explore; answers cannot be changed.</p><div class="chart-card"><div class="chart-bar"><h3>Three pressures · One position</h3><div class="tools" id="resultTools"></div></div><div class="chart-region"><div class="graph-wrap"><canvas id="resultCanvas" class="chartcanvas" aria-label="Three dimensional triangular pressure diagram"></canvas><div class="graph-note"><span class="color" style="background:var(--red)"></span> Your position <span class="color" style="background:#8b9793;margin-left:13px"></span> Other anonymous submissions</div></div></div></div><p class="readme-line">You can revisit your response from this browser. Keep your anonymous three-digit code for reference; the code alone is not proof of identity.</p><div class="actions"><span class="muted" style="font-size:12px">Withdrawal is permanent.</span><button id="btnWithdraw" class="btn" type="button">Withdraw and delete my response</button></div></div>
 </div>
@@ -229,7 +229,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #559d91;outline-offse
     <div class="table-scroll"><table class="report-table" id="distributionTable"><thead><tr><th>Measure</th><th>Mean</th><th>0–24.9</th><th>25–49.9</th><th>50–74.9</th><th>75–100</th><th>50–100 (%)</th><th>Answered</th><th>Skipped</th></tr></thead><tbody></tbody></table></div>
     <h3 class="serif" id="researchResponses">Participant dataset</h3><p class="muted" style="font-size:12px">One row per completed submission. IDs are anonymous 3-digit research codes, not student identification numbers. Select any row to inspect that point on the pyramid.</p>
     <div class="table-scroll"><table class="report-table response-table" id="responsesTable"><thead><tr><th>ID</th><th>Submitted · Eastern</th><th>Family</th><th>Finance</th><th>Evaluation</th><th>Pressure total</th><th>Concealment Q4–Q6</th></tr></thead><tbody></tbody></table></div>
-    <p class="method-note">Research note: these results are exploratory, self-reported 0–100 slider responses recorded to one decimal place. The three plotted pressures are not a clinical scale, and correlations do not establish causation. The minimum-visibility rule for the participant group plot remains five submissions. Participant IDs are limited to 100–999 (900 unique codes).</p>
+    <p class="method-note">Research note: these results are exploratory, self-reported 0–100 slider responses recorded to one decimal place. The plotted pressures reflect how closely respondents endorse each statement, not measured event frequencies or objective forces. This is not a clinical scale, and correlations do not establish causation. The minimum-visibility rule for the participant group plot remains five submissions. Participant IDs are limited to 100–999 (900 unique codes).</p>
    </div>
   </section>
  </div>
@@ -239,22 +239,22 @@ button:focus-visible,input:focus-visible{outline:3px solid #559d91;outline-offse
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 document.querySelectorAll('.sidenav a').forEach(link=>link.addEventListener('click',()=>{document.querySelectorAll('.sidenav a').forEach(item=>{item.classList.remove('active');item.removeAttribute('aria-current')});link.classList.add('active');link.setAttribute('aria-current','location')}));
-const STORAGE='theseam_saved_own_submission_v10';
+const STORAGE='theseam_saved_own_submission_v10_1';
 const IS_RESEARCHER=new URLSearchParams(location.search).get('report')==='1';
 const API='/api';
 let liveReady=false, researcherPassword='',poller=null,publicCount=0;
 let deviceToken='';
 const QUESTIONS=[
-'How often did the expectations of family or people supporting your education influence which academic possibilities felt open to you?',
-'How often did tuition, paid work, or living costs change which academic choices you considered realistically available?',
-'How often did the prospect of a grade or critique affect how openly you presented an idea that was still taking shape?',
-'How often did you leave a question unasked because you were uncertain how others might interpret it?',
-'How often did you describe a direction for your work as settled while you were still considering other possibilities?',
-'How often did you hold back work from feedback until you felt able to defend the decisions behind it?',
-'How often did keeping an uncertainty private make an interaction with classmates or instructors feel easier in the moment?',
-'How often did an uncertainty you kept private become harder to address later in your work?',
-'How often did you share a developing idea with someone before you could say confidently where it might lead?'];
- const LABELS=['Never','Rarely','Sometimes','Often'];
+'The expectations of my family or people supporting me influenced which academic choices felt possible.',
+'Financial responsibilities influenced which academic opportunities or directions I felt able to pursue.',
+'The prospect of a grade or critique influenced what I chose to reveal about ideas that were still developing.',
+'I kept a question to myself because I was concerned about how asking it might be perceived.',
+'I presented an academic decision as settled even though I was still considering alternatives.',
+'I postponed seeking feedback until I felt prepared to explain or defend my approach.',
+'Keeping an uncertainty private made an interaction with an instructor or classmate easier in the moment.',
+'An uncertainty I kept private became more difficult to address later in my work.',
+'I shared an unfinished idea before knowing whether it would work.'];
+ // Every item uses the same experience-applicability response scale.
  const scoreOK=v=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=100&&Math.abs(v*10-Math.round(v*10))<1e-7;
  const fmtScore=v=>Number(v).toFixed(1);
 const COLORS=[[55,119,172],[33,155,140],[198,138,83]];
@@ -263,7 +263,7 @@ let state={records:[],submitted:null}, answers=Array(9).fill(null),skipped=Array
 let storageAvailable=true, studentChart,researchChart,successChart, lastInspected=null;
 let syncChannel=null;
 function getStored(){try{const v=localStorage.getItem(STORAGE);if(v){const obj=JSON.parse(v);if(obj&&validRecord(obj.own)&&obj.submitted===obj.own.id)return{records:[obj.own],submitted:obj.submitted}}}catch(e){storageAvailable=false}return{records:[],submitted:null}}
-function validRecord(r){return r && r.type==='participant' && r.survey_version==='V10' && typeof r.id==='string' && Array.isArray(r.answers) && r.answers.length===9 && r.answers.every(v=>v===null||scoreOK(v))&&!isNaN(new Date(r.created_at).getTime())}
+function validRecord(r){return r && r.type==='participant' && r.survey_version==='V10.1' && typeof r.id==='string' && Array.isArray(r.answers) && r.answers.length===9 && r.answers.every(v=>v===null||scoreOK(v))&&!isNaN(new Date(r.created_at).getTime())}
 function commit(){try{const own=state.records.find(r=>r.id===state.submitted);if(own)localStorage.setItem(STORAGE,JSON.stringify({own,submitted:own.id}));}catch(e){storageAvailable=false}updateAll()}
 function status(t,error=false){$('statusText').textContent=t;$('appStatus').classList.toggle('error',error)}
 function average(index){const a=state.records.map(r=>r.answers[index]).filter(scoreOK);return a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(2):'—'}
@@ -323,14 +323,14 @@ function renderQuestion(){
  $('btnBack').textContent=i===0?'← Participation info':'← Back';$('btnNext').textContent=i===8?'Submit and lock my responses ✓':'Next question →';$('qError').hidden=true;
  const wrap=$('options');wrap.replaceChildren();
  const top=document.createElement('div');top.className='slider-top';
- const meta=document.createElement('div');meta.className='slider-kicker';meta.textContent='Frequency · 0 to 100';
+ const meta=document.createElement('div');meta.className='slider-kicker';meta.textContent='How true of your experience? · 0–100';
  const readout=document.createElement('div');readout.className='slider-readout';readout.setAttribute('aria-live','polite');top.append(meta,readout);
- const slider=document.createElement('input');slider.className='slider-input';slider.id='qSlider';slider.type='range';slider.min='0';slider.max='100';slider.step='0.1';slider.value=answers[i]??50;slider.setAttribute('aria-label','Frequency rating from zero, Never, to one hundred, Often');
- const ends=document.createElement('div');ends.className='slider-labels';ends.innerHTML='<span>0 · Never</span><span>100 · Often</span>';
+ const slider=document.createElement('input');slider.className='slider-input';slider.id='qSlider';slider.type='range';slider.min='0';slider.max='100';slider.step='0.1';slider.value=answers[i]??50;slider.setAttribute('aria-label','How true was this statement for you? Zero means not at all true of your experience and one hundred means completely true of your experience');
+ const ends=document.createElement('div');ends.className='slider-labels';ends.innerHTML='<span>0 · Not at all true</span><span>100 · Completely true</span>';
  const ticks=document.createElement('div');ticks.className='slider-scale';ticks.innerHTML='<span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>';
  const adjust=document.createElement('label');adjust.className='slider-adjust';adjust.htmlFor='qNumeric';adjust.textContent='Enter a precise value (optional)';
- const numeric=document.createElement('input');numeric.id='qNumeric';numeric.className='slider-number';numeric.type='number';numeric.min='0';numeric.max='100';numeric.step='0.1';numeric.placeholder='0.0–100.0';numeric.value=answers[i]===null?'':fmtScore(answers[i]);numeric.setAttribute('aria-label','Precise frequency rating');adjust.appendChild(numeric);
- const hint=document.createElement('div');hint.className='slider-hint';hint.textContent='Use the slider or enter a number to one decimal place. Your choice is not recorded until you submit the survey.';
+ const numeric=document.createElement('input');numeric.id='qNumeric';numeric.className='slider-number';numeric.type='number';numeric.min='0';numeric.max='100';numeric.step='0.1';numeric.placeholder='0.0–100.0';numeric.value=answers[i]===null?'':fmtScore(answers[i]);numeric.setAttribute('aria-label','How closely this statement describes your experience, precise 0 to 100 rating');adjust.appendChild(numeric);
+ const hint=document.createElement('div');hint.className='slider-hint';hint.textContent='0 = not at all true of your experience. 100 = completely true of your experience. Decimal values are welcome; nothing is saved until submission.';
  const show=()=>{readout.textContent=answers[i]===null?'— / 100':fmtScore(answers[i])+' / 100'};
  const setValue=value=>{const n=Number(value);if(!scoreOK(n)){numeric.setCustomValidity('Enter a value from 0 to 100 in 0.1 increments.');return false}numeric.setCustomValidity('');skipped[i]=false;answers[i]=Math.round(n*10)/10;slider.value=answers[i];numeric.value=fmtScore(answers[i]);$('qError').hidden=true;show();return true};
  slider.addEventListener('input',()=>setValue(slider.value));
@@ -378,7 +378,7 @@ async function fetchPublicMap(){
   publicCount=data.count;
   const own=state.records.find(r=>r.id===state.submitted);
   const anon=(data.points||[]).filter(p=>Array.isArray(p.answers)&&p.answers.length===3)
-    .map((p,i)=>({type:'participant',survey_version:'V10',id:'group-'+i,answers:[...p.answers,0,0,0,0,0,0],created_at:null}));
+    .map((p,i)=>({type:'participant',survey_version:'V10.1',id:'group-'+i,answers:[...p.answers,0,0,0,0,0,0],created_at:null}));
   if(!IS_RESEARCHER){state.records=[...anon,...(own?[own]:[])];updateAll();}
   if($('resultExplanation')&&state.submitted){
    const eligible=data.plotted_count??0;
@@ -401,11 +401,11 @@ async function fetchAdmin(credential=researcherPassword){
  return data;
 }
 async function checkLive(){
- try{const response=await fetch(API+'/health',{cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw Error('Backend not available');liveReady=true;status('Shared online storage connected ✓');$('btnStart').disabled=false;return true}
- catch(e){liveReady=false;status('Shared storage offline: website is not yet fully deployed. Survey submissions are disabled.',true);$('btnStart').disabled=true;return false}
+ try{const response=await fetch(API+'/health',{cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok||data.study!=='THE SEAM V10.1')throw Error('V10.1 backend is not available');liveReady=true;status('Shared online storage connected ✓');$('btnStart').disabled=false;return true}
+ catch(e){liveReady=false;status('V10.1 shared storage is offline or out of date. Survey submissions are disabled.',true);$('btnStart').disabled=true;return false}
 }
 function getDeviceToken(){
- try{let t=localStorage.getItem('theseam_anonymous_device_v10');if(!t){const bytes=new Uint8Array(24);crypto.getRandomValues(bytes);t=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem('theseam_anonymous_device_v10',t)}return t}
+ try{let t=localStorage.getItem('theseam_anonymous_device_v10_1');if(!t){const bytes=new Uint8Array(24);crypto.getRandomValues(bytes);t=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem('theseam_anonymous_device_v10_1',t)}return t}
  catch{return ''}
 }
 function startPolling(){if(poller)clearInterval(poller);poller=setInterval(()=>{if(document.visibilityState==='visible'){if(IS_RESEARCHER&&researcherPassword)fetchAdmin().catch(e=>status(e.message,true));else if(state.submitted)fetchPublicMap()}},3000)}
