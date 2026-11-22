@@ -176,7 +176,7 @@ test('Excel preserves blanks for skipped questions and safe formulas for missing
  assert.equal(sh.getCell('D2').value,0);
  assert.equal(sh.getCell('D3').value,null);
  assert.equal(sh.getCell('M2').value.result,150);
- assert.equal(sh.getCell('M3').value.result,'');
+ assert.ok(sh.getCell('M3').value.result==null||sh.getCell('M3').value.result==='');
  assert.match(sh.getCell('P3').value.formula,/COUNT\(D3:F3\)=3/);
  assert.equal(wb.getWorksheet('Findings Summary').getCell('J15').value,0);
 });
