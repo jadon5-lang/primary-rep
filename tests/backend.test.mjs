@@ -98,7 +98,7 @@ test('V10 zero is a valid intentional answer and 100 is the maximum', async () =
 });
 test('one decimal place allowed, invalid values rejected', async () => {
  const fresh=new MemoryStore();
- const invalid=[[0,0,0,0,0,0,0,0,100.01],[0,0,0,0,0,0,0,0,101],[0,0,0,0,0,0,0,0,-0.1],[0,0,0,0,0,0,0,0,null],[0,0,0,0,0,0,0,0,1.234],[0,0,0,0,0,0,0,0,'30']];
+ const invalid=[[0,0,0,0,0,0,0,0,100.01],[0,0,0,0,0,0,0,0,101],[0,0,0,0,0,0,0,0,-0.1],[0,0,0,0,0,0,0,0,1.234],[0,0,0,0,0,0,0,0,'30']];
  for(let i=0;i<invalid.length;i++){
    const res=await handleSeamRequest(req('submit','POST',{consent:true,answers:invalid[i],device_token:token(401+i)}),()=>fresh,{password:secret});
    assert.equal(res.status,400);
@@ -112,4 +112,71 @@ test('V9 records are excluded from V10 summaries by version', async () => {
  await fresh.setJSON('entry/101',{type:'participant',id:'101',answers:Array(9).fill(1),created_at:new Date().toISOString()});
  const body=await (await handleSeamRequest(req('research','GET',null,{authorization:'Bearer '+secret}),()=>fresh,{password:secret})).json();
  assert.equal(body.summary.count,0);assert.equal(body.records.length,0);
+});
+
+test('participants can skip any question without equating a skip to zero', async () => {
+ const fresh=new MemoryStore();
+ const answers=[0,null,55.5,null,25,50,null,0,null];
+ const r=await handleSeamRequest(req('submit','POST',{consent:true,answers,device_token:token(500)}),()=>fresh,{password:secret});
+ assert.equal(r.status,201);
+ const body=await r.json();assert.equal(body.record.coords,null);
+ assert.deepEqual(body.record.answers,answers);
+ const report=await (await handleSeamRequest(req('research','GET',null,{authorization:'Bearer '+secret}),()=>fresh,{password:secret})).json();
+ assert.equal(report.summary.count,1);assert.equal(report.summary.plotted_count,0);
+ assert.equal(report.summary.pressure.mean,null);
+ assert.equal(report.summary.dimensions[0].mean,0);
+ assert.equal(report.summary.dimensions[1].mean,null);
+ assert.equal(report.summary.dimensions[1].skipped_count,1);
+ assert.equal(report.summary.dimensions[5].mean,50);
+ assert.equal(report.summary.dimensions[6].answered_count,0);
+ assert.equal(report.summary.concealment_mean,37.5);
+});
+test('only complete pressure records appear in public 3D diagram', async () => {
+ const fresh=new MemoryStore();
+ const postTo=(i,a)=>handleSeamRequest(req('submit','POST',{consent:true,answers:a,device_token:token(i)}),()=>fresh,{password:secret});
+ for(let i=0;i<5;i++)assert.equal((await postTo(600+i,[20+i,30+i,40+i,0,0,0,0,0,0])).status,201);
+ const skip=await postTo(620,[null,100,100,0,0,0,0,0,0]);assert.equal(skip.status,201);
+ const map=await (await handleSeamRequest(req('map','GET',null,{'x-seam-token':token(620)}),()=>fresh,{password:secret})).json();
+ assert.equal(map.count,6);assert.equal(map.plotted_count,5);
+ assert.equal(map.points.length,5);
+ assert.ok(map.points.every(p=>p.answers.length===3&&p.answers.every(x=>typeof x==='number')));
+});
+test('same-browser withdrawal deletes both response and claim, but another browser cannot delete it', async () => {
+ const fresh=new MemoryStore(), t=token(701),alien=token(702);
+ const submitted=await (await handleSeamRequest(req('submit','POST',{consent:true,answers:Array(9).fill(30),device_token:t}),()=>fresh,{password:secret})).json();
+ const id=submitted.record.id;
+ const bad=await handleSeamRequest(req('withdraw','POST',{id,device_token:alien}),()=>fresh,{password:secret});
+ assert.equal(bad.status,403);
+ const ok=await handleSeamRequest(req('withdraw','POST',{id,device_token:t}),()=>fresh,{password:secret});
+ assert.equal(ok.status,200);assert.equal((await ok.json()).withdrawn,true);
+ const rem=await (await handleSeamRequest(req('research','GET',null,{authorization:'Bearer '+secret}),()=>fresh,{password:secret})).json();
+ assert.equal(rem.summary.count,0);
+ assert.equal((await fresh.list({prefix:'claim/'})).blobs.length,0);
+});
+test('password-protected researcher can honor removal request', async () => {
+ const fresh=new MemoryStore();
+ const created=await (await handleSeamRequest(req('submit','POST',{consent:true,answers:Array(9).fill(80),device_token:token(801)}),()=>fresh,{password:secret})).json();
+ const id=created.record.id;
+ const rejected=await handleSeamRequest(req('remove-record','POST',{id}),()=>fresh,{password:secret});assert.equal(rejected.status,401);
+ const removed=await handleSeamRequest(req('remove-record','POST',{id},{authorization:'Bearer '+secret}),()=>fresh,{password:secret});
+ assert.equal(removed.status,200);
+ assert.equal((await fresh.list({prefix:'entry/'})).blobs.length,0);
+});
+test('Excel preserves blanks for skipped questions and safe formulas for missing pressure', async () => {
+ const {makeWorkbook}=await import('../lib/workbook.mjs');
+ const ExcelJS=(await import('exceljs')).default;
+ const now=new Date().toISOString();
+ const rows=[
+  {id:'110',type:'participant',survey_version:'V10',created_at:now,answers:[0,100,50,20,30,40,50,60,70]},
+  {id:'111',type:'participant',survey_version:'V10',created_at:now,answers:[null,100,50,null,30,40,50,60,70]}
+ ];
+ const wbytes=await makeWorkbook(rows,summarize(rows));const wb=new ExcelJS.Workbook();
+ await wb.xlsx.load(wbytes);
+ const sh=wb.getWorksheet('Anonymous Responses');
+ assert.equal(sh.getCell('D2').value,0);
+ assert.equal(sh.getCell('D3').value,null);
+ assert.equal(sh.getCell('M2').value.result,150);
+ assert.equal(sh.getCell('M3').value.result,'');
+ assert.match(sh.getCell('P3').value.formula,/COUNT\(D3:F3\)=3/);
+ assert.equal(wb.getWorksheet('Findings Summary').getCell('J15').value,0);
 });
