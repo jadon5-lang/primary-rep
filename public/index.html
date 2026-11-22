@@ -356,6 +356,7 @@ function renderQuestion(){
    if(!scoreOK(n)){numeric.setCustomValidity('Enter a value from 0 to 100, to one decimal place.');return false}
    numeric.setCustomValidity('');skipped[i]=false;answers[i]=Math.round(n*10)/10;numeric.value=fmtScore(answers[i]);$('qError').hidden=true;show();return true;
  };
+ slider.addEventListener('pointerdown',()=>{if(answers[i]===null)setValue(slider.value)});
  slider.addEventListener('input',()=>setValue(slider.value));
  numeric.addEventListener('change',()=>{if(numeric.value.trim()!=='')setValue(numeric.value);else{answers[i]=null;skipped[i]=false;show()}});
  numeric.addEventListener('input',()=>{
