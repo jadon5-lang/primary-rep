@@ -362,7 +362,7 @@ async function submit(){
   initCharts();studentChart.selection=data.record.id;successChart.selection=data.record.id;
   studentChart.draw();successChart.draw();
   $('successBackdrop').hidden=false;modalOpen=true;$('successBackdrop').querySelector('.modal').scrollTop=0;$('btnExplore').focus({preventScroll:true});
-  $('successHeading').textContent='Submission confirmed and saved.';$('modalParticipantId').textContent='Research ID: '+data.record.id;$('resultParticipantId').textContent='ANONYMOUS ID '+data.record.id;
+  $('successHeading').textContent='Submission confirmed and saved.';$('modalTip').textContent=hasPressure(data.record)?'Your red point appears after submission; other points appear after five complete pressure responses.':'Your responses are saved, but no personal point is calculated because a pressure question was skipped.';$('modalParticipantId').textContent='Research ID: '+data.record.id;$('resultParticipantId').textContent='ANONYMOUS ID '+data.record.id;
   status(data.recovered?'Previous submission restored successfully ✓':'Saved to shared online dataset ✓');
   await fetchPublicMap();
   successChart?.draw();studentChart?.draw();
@@ -380,9 +380,13 @@ async function fetchPublicMap(){
   const anon=(data.points||[]).filter(p=>Array.isArray(p.answers)&&p.answers.length===3)
     .map((p,i)=>({type:'participant',survey_version:'V10',id:'group-'+i,answers:[...p.answers,0,0,0,0,0,0],created_at:null}));
   if(!IS_RESEARCHER){state.records=[...anon,...(own?[own]:[])];updateAll();}
-  if($('resultExplanation')&&state.submitted){$('resultExplanation').textContent=data.count<5?
-   `Your red dot is saved. ${data.count} of 5 minimum responses received; the collective dots will appear when five participants have submitted.`:
-   `Your red dot is shown among ${Math.max(0,data.count-1)} other anonymous responses. The diagram refreshes automatically; answers remain locked.`;}
+  if($('resultExplanation')&&state.submitted){
+   const eligible=data.plotted_count??0;
+   $('resultExplanation').textContent=!own||!hasPressure(own)?
+     'Your responses are saved. You skipped at least one pressure question, so no personal point is plotted. A skipped answer is never treated as zero.':
+     eligible<5?`Your point is saved. ${eligible} of five fully plotted submissions received; other points appear when that threshold is reached.`:
+     `Your red marker appears alongside ${Math.max(0,eligible-1)} other anonymous points. The diagram refreshes automatically.`;
+  }
  }catch(e){if(!IS_RESEARCHER)status('The collective diagram is temporarily unavailable. Your submitted response remains saved.',true);}
 }
 async function fetchAdmin(credential=researcherPassword){
@@ -410,10 +414,22 @@ function showResult(){const record=state.records.find(r=>r.id===state.submitted)
 function showStudent(){activeView='student';$('studentScreen').hidden=false;$('researchScreen').hidden=true;$('tabStudent').classList.add('active');$('tabResearch').classList.remove('active');if(state.submitted)showResult();else{$('surveyArea').hidden=false;$('studentResult').hidden=true}setTimeout(()=>studentChart?.size(),40)}
 function showResearch(){if(!IS_RESEARCHER)return;activeView='research';$('studentScreen').hidden=true;$('researchScreen').hidden=false;$('tabStudent').classList.remove('active');$('tabResearch').classList.add('active');initCharts();updateAll();setTimeout(()=>researchChart?.size(),55)}
 function initCharts(){if(!studentChart){studentChart=new Triangle($('resultCanvas'));controlBar($('resultTools'),studentChart)}if(!researchChart){researchChart=new Triangle($('researchCanvas'),{researcher:true});controlBar($('researchTools'),researchChart)}if(!successChart){successChart=new Triangle($('successCanvas'))}studentChart.selection=state.submitted;successChart.selection=state.submitted;}
-function inspectValues(r){$('inspectHead').textContent='Participant '+r.id;$('inspectId').textContent=r.id;$('inspectEmpty').hidden=true;$('inspectDetails').hidden=false;$('inspectTime').textContent=timestamp(r.created_at);$('inspectFamily').textContent=`${fmtScore(r.answers[0])} / 100`;$('inspectFinancial').textContent=`${fmtScore(r.answers[1])} / 100`;$('inspectAcademic').textContent=`${fmtScore(r.answers[2])} / 100`;$('inspectTotal').textContent=`${metrics(r).total.toFixed(1)} / 300`;const m=metrics(r);const overlapping=state.records.filter(p=>{const mp=metrics(p);return Math.abs(mp.top.x-m.top.x)<.001&&Math.abs(mp.top.y-m.top.y)<.001&&Math.abs(mp.top.z-m.top.z)<.001});$('inspectOverlapsWrap').hidden=overlapping.length<2;$('inspectOverlaps').textContent=overlapping.length>1?`${overlapping.length} participants share these coordinates. Choose an ID to inspect each record.`:'';const picker=$('overlapPicker');picker.hidden=overlapping.length<2;picker.replaceChildren();if(overlapping.length>1){overlapping.forEach(p=>{const option=document.createElement('option');option.value=p.id;option.textContent=`ID ${p.id}`;picker.appendChild(option)});picker.value=r.id}}
+let selectedResearchId=null;
+function inspectValues(r){
+ $('inspectHead').textContent='Participant '+r.id;$('inspectId').textContent=r.id;
+ $('inspectEmpty').hidden=true;$('inspectDetails').hidden=false;$('inspectTime').textContent=timestamp(r.created_at);
+ $('inspectFamily').textContent=fmtMaybe(r.answers[0]);$('inspectFinancial').textContent=fmtMaybe(r.answers[1]);$('inspectAcademic').textContent=fmtMaybe(r.answers[2]);
+ const m=metrics(r);$('inspectTotal').textContent=m?m.total.toFixed(1)+' / 300':'Not plotted (skipped)';
+ const overlapping=m?state.records.filter(p=>{const mp=metrics(p);return mp&&Math.abs(mp.top.x-m.top.x)<.001&&Math.abs(mp.top.y-m.top.y)<.001&&Math.abs(mp.top.z-m.top.z)<.001}):[];
+ $('inspectOverlapsWrap').hidden=overlapping.length<2;
+ $('inspectOverlaps').textContent=overlapping.length>1?`${overlapping.length} participants share these coordinates. Choose an ID to inspect each record.`:'';
+ const picker=$('overlapPicker');picker.hidden=overlapping.length<2;picker.replaceChildren();
+ if(overlapping.length>1){overlapping.forEach(p=>{const option=document.createElement('option');option.value=p.id;option.textContent=`ID ${p.id}`;picker.appendChild(option)});picker.value=r.id}
+ selectedResearchId=r.id;$('btnRemoveSelected').disabled=false;
+}
 function showInspection(r){inspectValues(r)}
-function clearInspection(){$('inspectHead').textContent='Select a point';$('inspectEmpty').hidden=false;$('inspectDetails').hidden=true}
-function updateAll(){const n=state.records.length;$('statCount').textContent=n;$('statFamily').textContent=average(0);$('statFinancial').textContent=average(1);$('statAcademic').textContent=average(2);$('statTotal').textContent=n?(state.records.reduce((s,r)=>s+metrics(r).total,0)/n).toFixed(2):'—';$('researchUpdated').textContent=n?`Last submission: ${timestamp(state.records[n-1].created_at)}`:'No submissions yet';if(researchChart)researchChart.draw();if(studentChart)studentChart.draw();if(successChart)successChart.draw()}
+function clearInspection(){$('inspectHead').textContent='Select a point';$('inspectEmpty').hidden=false;$('inspectDetails').hidden=true;selectedResearchId=null;$('btnRemoveSelected').disabled=true}
+function updateAll(){const n=state.records.length;$('statCount').textContent=n;$('statFamily').textContent=average(0);$('statFinancial').textContent=average(1);$('statAcademic').textContent=average(2);const plotted=state.records.map(metrics).filter(Boolean);$('statTotal').textContent=plotted.length?(plotted.reduce((s,m)=>s+m.total,0)/plotted.length).toFixed(2):'—';$('researchUpdated').textContent=n?`Last submission: ${timestamp(state.records[n-1].created_at)}`:'No submissions yet';if(researchChart)researchChart.draw();if(studentChart)studentChart.draw();if(successChart)successChart.draw()}
 function resetStudy(){fetchAdmin().catch(e=>status('Unable to refresh: '+e.message,true))}
 async function exportCSV(){
  if(!researcherPassword){status('Unlock researcher dashboard before exporting.',true);return}
@@ -432,18 +448,18 @@ function renderFindings(summary,rows){
  let narrative='';
  if(!summary.count)narrative='No responses have been submitted. The 3D pyramid, the question distributions, and the Excel workbook will populate from real participants as soon as their submissions are confirmed.';
  else {
-  narrative=`<strong>${summary.count}</strong> anonymous participant${summary.count===1?' has':'s have'} submitted. The average total reported pressure is <strong>${val(summary.pressure.mean)} of 300</strong> (median ${val(summary.pressure.median)}). `;
-  narrative+=summary.highest_mean_pressure?.includes('(tied)')?`The three plotted dimensions show a shared highest mean: <strong>${summary.highest_mean_pressure}</strong>. `:`Among the three plotted dimensions, <strong>${summary.highest_mean_pressure}</strong> currently has the highest mean rating. `;
+  narrative=`<strong>${summary.count}</strong> anonymous participant${summary.count===1?' has':'s have'} submitted; <strong>${summary.plotted_count}</strong> completed all three pressure measures and have plotted coordinates. Average complete-case pressure is <strong>${val(summary.pressure.mean)} / 300</strong> (median ${val(summary.pressure.median)}). `;
+  if(summary.highest_mean_pressure)narrative+=summary.highest_mean_pressure.includes('(tied)')?`The highest mean is shared: <strong>${summary.highest_mean_pressure}</strong>. `:`The highest mean is <strong>${summary.highest_mean_pressure}</strong>. `;
   narrative+=`The mean response across Q4–Q6, which describe not asking questions, presenting a decision as settled, or postponing feedback, is <strong>${val(summary.concealment_mean)} of 100</strong>. `;
   if(summary.relationship!==null)narrative+=`The descriptive Pearson correlation between total pressure and the Q4–Q6 mean is <strong>${val(summary.relationship)}</strong>. This is an association, not evidence of cause and effect. `;
-  else narrative+='A pressure/concealment correlation is withheld until at least five submissions with meaningful variation are available. ';
+  else narrative+='A pressure/concealment correlation requires at least five complete Q1–Q6 submissions with meaningful variation. ';
   if(summary.count<20)narrative+='This is an early sample; avoid drawing general conclusions from it.';
  }
  $('findingNarrative').innerHTML=narrative;
  const dist=$('distributionTable').querySelector('tbody');dist.replaceChildren();
- (summary.dimensions||[]).forEach(d=>{const tr=document.createElement('tr');[`${d.question} · ${d.name}`,val(d.mean),...d.counts,pct(d.frequent_pct)].forEach(item=>{const td=document.createElement('td');td.textContent=item;tr.appendChild(td)});dist.appendChild(tr)});
+ (summary.dimensions||[]).forEach(d=>{const tr=document.createElement('tr');[`${d.question} · ${d.name}`,val(d.mean),...d.counts,pct(d.frequent_pct),d.answered_count,d.skipped_count].forEach(item=>{const td=document.createElement('td');td.textContent=item;tr.appendChild(td)});dist.appendChild(tr)});
  const tbody=$('responsesTable').querySelector('tbody');tbody.replaceChildren();
- rows.forEach(r=>{const tr=document.createElement('tr'),a=r.answers;const vals=[r.id,timestamp(r.created_at),fmtScore(a[0]),fmtScore(a[1]),fmtScore(a[2]),(a[0]+a[1]+a[2]).toFixed(1),((a[3]+a[4]+a[5])/3).toFixed(2)];vals.forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});tr.tabIndex=0;tr.setAttribute('role','button');tr.setAttribute('aria-label','Inspect participant '+r.id);const inspectRow=()=>{showInspection(r);$('researchCanvas').scrollIntoView({behavior:'smooth',block:'center'})};tr.addEventListener('click',inspectRow);tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inspectRow()}});tbody.appendChild(tr)});
+ rows.forEach(r=>{const tr=document.createElement('tr'),a=r.answers;const vals=[r.id,timestamp(r.created_at),fmtMaybe(a[0]),fmtMaybe(a[1]),fmtMaybe(a[2]),metrics(r)?.total.toFixed(1)??'—',meanAnswered(a.slice(3,6))?.toFixed(2)??'—'];vals.forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});tr.tabIndex=0;tr.setAttribute('role','button');tr.setAttribute('aria-label','Inspect participant '+r.id);const inspectRow=()=>{showInspection(r);$('researchCanvas').scrollIntoView({behavior:'smooth',block:'center'})};tr.addEventListener('click',inspectRow);tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inspectRow()}});tbody.appendChild(tr)});
  $('reportGenerated').textContent=`Updated ${new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date())}`;
 }
 async function downloadPrivate(endpoint,filename){
