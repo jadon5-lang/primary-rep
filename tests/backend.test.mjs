@@ -260,8 +260,8 @@ test('release compatibility: V9 researcher interface controls and structure are 
  assert.equal((distribution.match(/<th>/g)||[]).length,7,'Preserve original seven-column research distribution layout');
  assert.match(html,/new URLSearchParams\(location.search\).get\('report'\)==='1'/,'Keep existing researcher URL mechanism');
  assert.match(html,/\$\('tabResearch'\)\.hidden=!IS_RESEARCHER/);
- assert.match(html,/fetch\(API+'\/research'/,'Research endpoint wiring must remain intact');
- assert.match(html,/fetch\(API+'\/export'/);
+ assert.ok(html.includes("fetch(API+'/research'"),'Research endpoint wiring must remain intact');
+ assert.ok(html.includes("fetch(API+'/export'"));
  assert.match(html,/downloadPrivate\('workbook'/);
 });
 test('release integration: participant submissions remain linked to the private research page and exports', async () => {
