@@ -195,7 +195,8 @@ test('V10.2 presents all nine survey items with appropriate question-specific sl
  assert.deepEqual(scales.map(s=>s.high),['Decisive influence','Completely dependent','Decisive influence','Very often','Very often','Very often','Substantial relief','Severe difficulty','Fully willing']);
  assert.ok(questions.slice(3,6).every(q=>q.startsWith('How often')));
  assert.ok(questions.slice(6,8).every(q=>q.startsWith('When you kept an uncertainty private')));
- assert.match(html,/ends\.replaceChildren\(\)/);
+ assert.match(html,/ends\.className='slider-labels'/);
+ assert.match(html,/\['0 · '\+scale\.low,'100 · '\+scale\.high\]/);
  assert.match(html,/meta\.textContent=scale.kind/);
  assert.match(html,/Your responses are saved/);
  assert.match(html,/id="studentResult"[^>]*hidden/);
