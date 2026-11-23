@@ -48,3 +48,47 @@ jobs:
           status=$(curl --silent --output /dev/null --write-out '%{http_code}' --location --max-time 15 "$URL/api/research")
           [[ "$status" == "401" ]] || { echo "FAIL: Private researcher endpoint must refuse unauthenticated access (received $status)."; exit 1; }
           echo "PASS: Researcher endpoint requires authentication. No test participant records were submitted."
+      - name: Verify Netlify stores, recovers and withdraws a temporary TEST response
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {randomBytes} from 'node:crypto';
+          const base='https://the-seam-v9-test.netlify.app/api/';
+          const token=randomBytes(32).toString('base64url');
+          const answers=[61.7,42.6,73.2,11.1,26.6,31.5,null,null,84.9];
+          const json=async(response)=>{let d;try{d=await response.json()}catch{throw new Error('Expected JSON from '+response.url+' (HTTP '+response.status+')')}return d};
+          let id=null;
+          try{
+            const payload={consent:true,answers,device_token:token};
+            const response=await fetch(base+'submit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+            const submitted=await json(response);
+            if(response.status!==201||!submitted.ok)throw new Error('New TEST submission failed (HTTP '+response.status+'): '+(submitted.error||'unknown error'));
+            id=submitted.record.id;
+            assert.equal(submitted.record.survey_version,'V10.2');
+            assert.deepEqual(submitted.record.answers,answers);
+            assert.ok(/^\\d{3}$/.test(id));
+            assert.ok(submitted.record.coords,'A complete Q1–Q3 score must plot');
+            const mappedResponse=await fetch(base+'map',{headers:{'x-seam-token':token}});
+            const mapped=await json(mappedResponse);
+            assert.equal(mappedResponse.status,200);
+            assert.equal(mapped.ok,true);
+            assert.ok(mapped.count>=1);
+            assert.ok(mapped.plotted_count>=1);
+            const replay=await fetch(base+'submit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+            const saved=await json(replay);
+            assert.equal(replay.status,200,'Repeated submission must be recovered without duplicate');
+            assert.equal(saved.record.id,id);
+            assert.equal(saved.recovered,true);
+            console.log('PASS: Live V10.2 submission, decimal values, skipped responses, 3D coordinates, verified map and duplicate protection.');
+          } finally {
+            if(id){
+              const cleanup=await fetch(base+'withdraw',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id,device_token:token})});
+              const confirmation=await json(cleanup);
+              if(cleanup.status!==200||confirmation.withdrawn!==true)throw new Error('URGENT: TEST submission '+id+' could not be deleted from Netlify test dataset.');
+              const denied=await fetch(base+'map',{headers:{'x-seam-token':token}});
+              assert.equal(denied.status,403,'Withdrawn participant token must lose access');
+              console.log('PASS: Temporary TEST response was withdrawn and deleted; no test record retained.');
+            }
+          }
+          NODE
