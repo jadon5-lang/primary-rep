@@ -1,0 +1,31 @@
+name: Check with in the seam .com registration status
+on:
+  push:
+    branches: [domain-availability-audit-2026]
+  workflow_dispatch:
+jobs:
+  rdap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check authoritative Verisign .com registration status
+        run: |
+          python3 - <<'PY'
+          import urllib.request, urllib.error, json
+          domain='WITHINTHESEAM.COM'
+          urls=[
+           'https://rdap.verisign.com/com/v1/domain/'+domain,
+           'https://rdap.org/domain/'+domain.lower()
+          ]
+          for url in urls:
+            try:
+              request=urllib.request.Request(url,headers={'Accept':'application/rdap+json','User-Agent':'THE-SEAM-DOMAIN-CHECK/1.0'})
+              with urllib.request.urlopen(request,timeout=20) as resp:
+                d=json.load(resp)
+                print('RDAP URL',url,'STATUS',resp.status,'REGISTRATION EXISTS',True,
+                'DOMAIN NAME',d.get('ldhName'),'STATUS VALUES',d.get('status'))
+            except urllib.error.HTTPError as e:
+              print('RDAP URL',url,'HTTP',e.code,
+                    'POSSIBLY UNREGISTERED' if e.code==404 else 'CHECK FAILED')
+            except Exception as e:
+              print('RDAP URL',url,'ERROR',repr(e))
+          PY
