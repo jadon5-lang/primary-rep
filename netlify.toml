@@ -1,12 +1,23 @@
-# Free THE SEAM branded entrance, deployed as a SEPARATE Netlify project.
-# Never deploy this branch to the existing production survey project.
-# The real V10.2 survey, researcher dashboard, and shared data remain on
-# https://the-seam-survey.netlify.app.
+# Within the Seam: free branded hostname for the existing V10.2 survey.
+# Use a PROXY REWRITE (200), not an external browser redirect (302).
+# THE SEAM survey and Netlify Blob records remain on the existing live project.
+# The old https://the-seam-survey.netlify.app address and QR code remain valid.
 [build]
   publish = "public"
 
+# Route the survey API to the existing production backend and its database.
+# Origin header is fixed to the backend's own approved same-origin hostname.
+[[redirects]]
+  from = "/api/*"
+  to = "https://the-seam-survey.netlify.app/api/:splat"
+  status = 200
+  force = true
+  headers = {Origin = "https://the-seam-survey.netlify.app"}
+
+# Show the participant survey and researcher dashboard at the new address
+# while keeping the new address visible in the user's browser.
 [[redirects]]
   from = "/*"
   to = "https://the-seam-survey.netlify.app/:splat"
-  status = 302
+  status = 200
   force = true
