@@ -1,0 +1,39 @@
+name: Identify Live Netlify Branch Read Only
+on:
+  push:
+    branches: [v10-2-release]
+  workflow_dispatch:
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check public Netlify site metadata without logging private content
+        run: |
+          python3 - <<'PY'
+          import urllib.request, urllib.error, json, hashlib, pathlib
+          urls=[
+           ('netlify_site_api','https://api.netlify.com/api/v1/sites/the-seam-survey.netlify.app'),
+           ('live_home','https://the-seam-survey.netlify.app/'),
+           ('live_health','https://the-seam-survey.netlify.app/api/health'),
+           ('test_health','https://the-seam-v9-test.netlify.app/api/health'),
+          ]
+          for label,url in urls:
+           try:
+            req=urllib.request.Request(url,headers={'User-Agent':'THE-SEAM-RELEASE-CHECK/1.0'})
+            with urllib.request.urlopen(req,timeout=15) as r:
+             raw=r.read(250000);print(label,'status',r.status)
+             if label=='netlify_site_api':
+              d=json.loads(raw)
+              print('SITE BRANCH METADATA:',json.dumps({'name':d.get('name'),'url':d.get('url'),'repo_url':(d.get('build_settings') or {}).get('repo_url'),'repo_branch':(d.get('build_settings') or {}).get('repo_branch'),'published_deploy_branch':(d.get('published_deploy') or {}).get('branch'),'published_deploy_commit_ref':(d.get('published_deploy') or {}).get('commit_ref'),'current_deploy_id':d.get('published_deploy',{}).get('id')}))
+             elif label=='live_home':
+              p=pathlib.Path('public/index.html').read_bytes()
+              print('live_html_length',len(raw),'live_html_sha256',hashlib.sha256(raw).hexdigest(),'v102_release_length',len(p),'matches_v102',raw==p)
+              txt=raw.decode('utf-8','replace')
+              print('live_known_features',{'has_slider': 'slider-float' in txt,'has_old_four_choice':'Never (1)' in txt,'has_research_screen':'id="researchScreen"' in txt})
+             else:
+              d=json.loads(raw)
+              print('HEALTH:',json.dumps({'ok':d.get('ok'),'study':d.get('study'),'shared_storage':d.get('shared_storage')}))
+           except urllib.error.HTTPError as ex: print(label,'HTTP',ex.code)
+           except Exception as ex: print(label,'ERROR',type(ex).__name__,str(ex)[:200])
+          PY
