@@ -1,4 +1,4 @@
-name: Verify Free Within The Seam Link
+name: Verify Within The Seam Stable URL
 on:
   push:
     branches: [withintheseam-free-link]
@@ -7,40 +7,53 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify hosted link and researcher query forwarding
-        shell: bash
+      - name: Confirm branded hostname stays visible and safely uses original V10.2 backend
         run: |
           python3 - <<'PY'
-          import urllib.request,urllib.error,json
+          import json,time,urllib.request,urllib.error
           base="https://withintheseam.netlify.app"
-          tests=[("/", "https://the-seam-survey.netlify.app/"),("/?report=1", "https://the-seam-survey.netlify.app/?report=1"),("/api/health", "https://the-seam-survey.netlify.app/api/health")]
           class NoRedirect(urllib.request.HTTPRedirectHandler):
             def redirect_request(self,req,fp,code,msg,headers,newurl):
               return None
           opener=urllib.request.build_opener(NoRedirect)
-          passed=True
-          for path,expected in tests:
+          def call(path,method="GET",body=None,extra=None):
+            headers={"User-Agent":"WithinTheSeamSafeSmokeTest","Cache-Control":"no-cache"}
+            if extra: headers.update(extra)
+            req=urllib.request.Request(base+path,headers=headers,data=body,method=method)
+            try: r=opener.open(req,timeout=26)
+            except urllib.error.HTTPError as e:r=e
+            with r:
+              return r.status,r.headers.get("Location",""),r.read(180000).decode("utf-8","replace")
+          ready=False
+          for attempt in range(1,25):
             try:
-              resp=opener.open(urllib.request.Request(base+path,headers={"User-Agent":"TheSeamLinkCheck"}),timeout=25)
-            except urllib.error.HTTPError as exc:
-              resp=exc
+              code,location,home=call("/?live-check="+str(attempt))
+              c2,l2,research=call("/?report=1&live-check="+str(attempt))
+              c3,l3,healthRaw=call("/api/health?live-check="+str(attempt))
+              h=json.loads(healthRaw) if c3==200 else {}
+              print(json.dumps({"attempt":attempt,"home":code,"homeRedirect":location,"surveyUI":("slider-float" in home and "THE SEAM" in home),
+                "researcher":c2,"researchRedirect":l2,"researchScreen":('id="researchScreen"' in research),
+                "health":c3,"healthRedirect":l3,"study":h.get("study"),"storage":h.get("shared_storage")}),flush=True)
+              if (code==200 and not location and "slider-float" in home and "THE SEAM" in home
+                and c2==200 and not l2 and 'id="researchScreen"' in research
+                and c3==200 and not l3 and h.get("study")=="THE SEAM V10.2" and h.get("shared_storage") is True):
+                ready=True
+                break
             except Exception as exc:
-              print("ERROR",path,type(exc).__name__,str(exc))
-              passed=False
-              continue
-            location=resp.headers.get("Location","")
-            print("URL",path,"STATUS",resp.status,"LOCATION",location)
-            if resp.status not in [301,302,307,308] or location!=expected:
-              print("MISMATCH expected",expected)
-              passed=False
-          try:
-            response=urllib.request.urlopen("https://the-seam-survey.netlify.app/api/health",timeout=25)
-            health=json.load(response)
-            print("LIVE SURVEY",health.get("study"),"SHARED STORAGE",health.get("shared_storage"))
-            if health.get("study")!="THE SEAM V10.2" or health.get("shared_storage") is not True:passed=False
-          except Exception as exc:
-            print("LIVE HEALTH ERROR",type(exc).__name__,str(exc))
-            passed=False
-          if not passed:raise SystemExit("Redirect verification FAILED. Inspect logs and update redirect rules if necessary.")
-          print("PASS: Free branded entrypoint preserves main survey URL, researcher query and live database.")
+              print("Attempt",attempt,"error",type(exc).__name__,str(exc)[:150],flush=True)
+            time.sleep(15)
+          if not ready:
+            raise SystemExit("FAIL: Branded URL has not been verified. Original survey is unchanged.")
+          # An intentionally invalid payload tests origin handling without creating ANY records.
+          c4,l4,payload=call("/api/submit",method="POST",body=b"{}",extra={
+            "Origin":"https://withintheseam.netlify.app",
+            "Content-Type":"application/json"})
+          print("SAFE POST TEST:",c4,"REDIRECT:",l4,"RESPONSE:",payload[:200],flush=True)
+          if c4!=400 or l4:
+            raise SystemExit("FAIL: New domain may not submit to original backend. No real responses were submitted.")
+          c5,l5,_=call("/api/research")
+          print("PRIVATE RESEARCHER ENDPOINT:",c5,"REDIRECT:",l5,flush=True)
+          if c5!=401 or l5:
+            raise SystemExit("FAIL: Original protected researcher API not safely passed through.")
+          print("PASS: Branded URL stays visible; original V10.2 backend, survey and researcher page verified. No research data changed.")
           PY
