@@ -1,0 +1,12 @@
+# Free THE SEAM branded entrance, deployed as a SEPARATE Netlify project.
+# Never deploy this branch to the existing production survey project.
+# The real V10.2 survey, researcher dashboard, and shared data remain on
+# https://the-seam-survey.netlify.app.
+[build]
+  publish = "public"
+
+[[redirects]]
+  from = "/*"
+  to = "https://the-seam-survey.netlify.app/:splat"
+  status = 302
+  force = true
