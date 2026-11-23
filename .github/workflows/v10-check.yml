@@ -67,7 +67,7 @@ jobs:
             id=submitted.record.id;
             assert.equal(submitted.record.survey_version,'V10.2');
             assert.deepEqual(submitted.record.answers,answers);
-            assert.ok(/^\\d{3}$/.test(id));
+            assert.ok(/^\d{3}$/.test(id));
             assert.ok(submitted.record.coords,'A complete Q1–Q3 score must plot');
             const mappedResponse=await fetch(base+'map',{headers:{'x-seam-token':token}});
             const mapped=await json(mappedResponse);
