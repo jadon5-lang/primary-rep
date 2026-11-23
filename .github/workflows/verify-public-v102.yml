@@ -1,0 +1,50 @@
+name: Verify THE SEAM Live Production V10.2
+on:
+  push:
+    branches: [v9-staging]
+  workflow_dispatch:
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check public Netlify deployment, survey, and protected researcher access
+        env:
+          PUBLIC_URL: https://the-seam-survey.netlify.app
+        run: |
+          node --input-type=module <<'NODE'
+          const base = process.env.PUBLIC_URL;
+          const revision = process.env.GITHUB_SHA || 'v10-2';
+          const timeout = ms => AbortSignal.timeout(ms);
+          let ready = false;
+          for (let attempt=1;attempt<=24;attempt++) {
+            try {
+              const suffix = 'release_probe=' + encodeURIComponent(revision) + '&attempt=' + attempt;
+              const opts = {headers:{'cache-control':'no-cache'},signal:timeout(15000)};
+              const [health,home,report,privateEndpoint] = await Promise.all([
+                fetch(base+'/api/health?'+suffix,opts),
+                fetch(base+'/?'+suffix,opts),
+                fetch(base+'/?report=1&'+suffix,opts),
+                fetch(base+'/api/research?'+suffix,opts)
+              ]);
+              const h=await health.json();
+              const body=await home.text();
+              const researcher=await report.text();
+              const pass=health.ok&&h.ok===true&&h.study==='THE SEAM V10.2'&&h.shared_storage===true
+                &&home.ok&&body.includes('slider-float')&&body.includes('slider-input')
+                &&report.ok&&researcher.includes('id="researchScreen"')
+                &&privateEndpoint.status===401;
+              console.log(JSON.stringify({attempt,study:h.study,storage:h.shared_storage,
+                slider:body.includes('slider-float'),
+                researcher:researcher.includes('id="researchScreen"'),
+                researcherAuthStatus:privateEndpoint.status,verified:pass}));
+              if(pass){ready=true;break;}
+            }catch(err){console.log('Attempt '+attempt+': '+err.message);}
+            await new Promise(resolve=>setTimeout(resolve,15000));
+          }
+          if(!ready){
+            console.error('Public site is still not confirmed on V10.2. Check Netlify deployment and credits.');
+            process.exitCode=1;
+          } else {
+            console.log('PASS: Existing public URL is serving V10.2, with shared storage and the protected researcher page.');
+          }
+          NODE
