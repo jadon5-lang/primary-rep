@@ -309,3 +309,23 @@ test('release safety: new V10.2 submissions cannot touch the original V9 product
  assert.equal(storageScopeFor({deploy:{context:'production'}}),'site-wide-production');
  assert.equal(storageScopeFor({deploy:{context:'branch-deploy'}}),'deploy-specific-preview');
 });
+
+test('branded Netlify address accepts same-browser submission and withdrawal without trusting other origins',async()=>{
+ const fresh=new MemoryStore();
+ const tk=token(856);
+ const payload={consent:true,answers:[62.5,42.6,81.9,0,20,50,null,null,90.1],device_token:tk};
+ const brand={'Origin':'https://withintheseam.netlify.app'};
+ const blocked=await handleSeamRequest(req('submit','POST',payload,{'Origin':'https://untrusted.example'}),()=>fresh,{password:secret});
+ assert.equal(blocked.status,403);
+ assert.equal((await fresh.list({prefix:'entry/'})).blobs.length,0);
+ const submitted=await handleSeamRequest(req('submit','POST',payload,brand),()=>fresh,{password:secret});
+ assert.equal(submitted.status,201);
+ const record=(await submitted.json()).record;
+ assert.equal(record.survey_version,'V10.2');
+ const badWithdraw=await handleSeamRequest(req('withdraw','POST',{id:record.id,device_token:tk},{'Origin':'https://untrusted.example'}),()=>fresh,{password:secret});
+ assert.equal(badWithdraw.status,403);
+ const withdrawn=await handleSeamRequest(req('withdraw','POST',{id:record.id,device_token:tk},brand),()=>fresh,{password:secret});
+ assert.equal(withdrawn.status,200);
+ assert.equal((await withdrawn.json()).withdrawn,true);
+ assert.equal((await fresh.list({prefix:'entry/'})).blobs.length,0);
+});
