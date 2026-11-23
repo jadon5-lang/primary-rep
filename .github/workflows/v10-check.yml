@@ -1,7 +1,7 @@
 name: THE SEAM V10 Verification
 on:
   push:
-    branches: [v10-staging]
+    branches: [v10-staging, v10-2-release]
   workflow_dispatch:
 jobs:
   verify:
@@ -17,3 +17,34 @@ jobs:
       - name: Validate inline survey JavaScript
         run: |
           node --input-type=module -e "import fs from 'node:fs';import vm from 'node:vm';const s=fs.readFileSync('public/index.html','utf8');const script=s.match(/<script>([\\s\\S]*?)<\\/script>/)?.[1];if(!script)throw Error('No script found');new vm.Script(script);"
+
+  netlify-test-site:
+    if: github.ref == 'refs/heads/v10-2-release'
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm Netlify test site published the release without creating research records
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="https://the-seam-v9-test.netlify.app"
+          ok=0
+          for attempt in $(seq 1 14); do
+            html=$(curl --silent --show-error --location --max-time 12 "$URL/" || true)
+            health=$(curl --silent --show-error --location --max-time 12 "$URL/api/health" || true)
+            report=$(curl --silent --show-error --location --max-time 12 "$URL/?report=1" || true)
+            if [[ "$html" == *"slider-float"* ]] && [[ "$html" == *"question-text"* ]] && [[ "$report" == *'id="researchScreen"'* ]] && [[ "$health" == *'"study":"THE SEAM V10.2"'* ]] && [[ "$health" == *'"shared_storage":true'* ]]; then
+              echo "V10.2 survey, preserved researcher page and shared Netlify storage are live on the TEST site."
+              ok=1
+              break
+            fi
+            echo "Attempt $attempt: Waiting for test site to publish V10.2 (or for server-side storage to become healthy)..."
+            sleep 15
+          done
+          if [[ "$ok" != 1 ]]; then
+            echo "FAIL: Could not verify the full V10.2 test site. Inspect the Netlify test project's deploy log, build settings and environment variables."
+            exit 1
+          fi
+          status=$(curl --silent --output /dev/null --write-out '%{http_code}' --location --max-time 15 "$URL/api/research")
+          [[ "$status" == "401" ]] || { echo "FAIL: Private researcher endpoint must refuse unauthenticated access (received $status)."; exit 1; }
+          echo "PASS: Researcher endpoint requires authentication. No test participant records were submitted."
