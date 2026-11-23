@@ -1,0 +1,46 @@
+name: Verify Free Within The Seam Link
+on:
+  push:
+    branches: [withintheseam-free-link]
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify hosted link and researcher query forwarding
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.error,json
+          base="https://withintheseam.netlify.app"
+          tests=[("/", "https://the-seam-survey.netlify.app/"),("/?report=1", "https://the-seam-survey.netlify.app/?report=1"),("/api/health", "https://the-seam-survey.netlify.app/api/health")]
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self,req,fp,code,msg,headers,newurl):
+              return None
+          opener=urllib.request.build_opener(NoRedirect)
+          passed=True
+          for path,expected in tests:
+            try:
+              resp=opener.open(urllib.request.Request(base+path,headers={"User-Agent":"TheSeamLinkCheck"}),timeout=25)
+            except urllib.error.HTTPError as exc:
+              resp=exc
+            except Exception as exc:
+              print("ERROR",path,type(exc).__name__,str(exc))
+              passed=False
+              continue
+            location=resp.headers.get("Location","")
+            print("URL",path,"STATUS",resp.status,"LOCATION",location)
+            if resp.status not in [301,302,307,308] or location!=expected:
+              print("MISMATCH expected",expected)
+              passed=False
+          try:
+            response=urllib.request.urlopen("https://the-seam-survey.netlify.app/api/health",timeout=25)
+            health=json.load(response)
+            print("LIVE SURVEY",health.get("study"),"SHARED STORAGE",health.get("shared_storage"))
+            if health.get("study")!="THE SEAM V10.2" or health.get("shared_storage") is not True:passed=False
+          except Exception as exc:
+            print("LIVE HEALTH ERROR",type(exc).__name__,str(exc))
+            passed=False
+          if not passed:raise SystemExit("Redirect verification FAILED. Inspect logs and update redirect rules if necessary.")
+          print("PASS: Free branded entrypoint preserves main survey URL, researcher query and live database.")
+          PY
